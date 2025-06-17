@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  font-family: "Poppins", serif;
+}
+.Register {}
+.sign-up{
+  border: 2px solid rgb(217, 217, 217);
+  border-radius: 2%;
+  padding: 3rem;
+  width: 30%;
+
+}
+
+.my-form{
+  /* border: solid black; */
+  /* padding: 1.25rem; */
+  padding-top: 1rem;
+
+}
+
+.my-butt{
+  width: 100%;
+  color: white;
+  background-color: rgb(106, 13, 173);
+  border-radius: .375rem;
+  padding: .525rem;
+  padding-top: .6rem;
+  padding-bottom: .6rem;
+  margin-top: .9375rem;
+  margin-bottom:0.9375rem ;
+}
+.log-butt{
+  margin-top: .625rem;
+}
+
+.login-link{
+  margin-top: .9375rem;
+}
+.login-link a{
+  text-decoration: underline;
+}
+
+.login-link .link-color{
+  color:rgb(106, 13, 173) ;
+  margin-top: 5px;
+}
+.login-link .comp{
+  margin-top: .9375rem;
+  padding-top: 20px;
+}
+.image img{
+  width: 100%;
+}
+
+.forget {
+padding: 1.25rem;
+}
+
+.forget a{
+  text-decoration: underline;
+}

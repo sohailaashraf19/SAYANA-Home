@@ -1,0 +1,54 @@
+name: admin_sayana
+description: "A new Flutter project."
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.2
+  cupertino_icons: ^1.0.8
+  image_picker: ^1.0.0
+  permission_handler: ^10.2.0
+  cached_network_image: ^3.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  font_awesome_flutter: ^10.7.0
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/vases.png
+    - assets/coffee_table.png
+    - assets/cactus.png
+    - assets/SYANA HOME.png
+    - assets/img/placeholder.png
+    - assets/bedroom.png
+    - assets/diningroom.png
+    - assets/wallpapers.png
+    - assets/default_category.png
+    - assets/outdoors.png
+    - assets/kitchen.png
+    - assets/storage.png
+    - assets/electronic.png
+    - assets/tables.png
+    - assets/bathass.png
+    - assets/door.png
+    - assets/carpet.png
+    - assets/curtain.png
+    - assets/housedecor.png
+    - assets/lighter.png
+    - assets/mirrors.png
+    - assets/sofa.png
+    - assets/office.png
+    - assets/chair.png
+    - assets/default_category.png
+    - assets/default.png

@@ -1,0 +1,2 @@
+C:/Users/DELL/Downloads/my_house_design/my_house_design/android/app/.cxx/Debug/2x72j151/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/DELL/Downloads/my_house_design/my_house_design/android/app/.cxx/Debug/2x72j151/arm64-v8a/CMakeFiles/rebuild_cache.dir

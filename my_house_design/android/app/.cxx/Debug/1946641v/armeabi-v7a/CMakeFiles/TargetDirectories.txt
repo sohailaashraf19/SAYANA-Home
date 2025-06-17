@@ -1,0 +1,2 @@
+C:/xampp2/htdocs/syana/my_house_design/android/app/.cxx/Debug/1946641v/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/xampp2/htdocs/syana/my_house_design/android/app/.cxx/Debug/1946641v/armeabi-v7a/CMakeFiles/rebuild_cache.dir
