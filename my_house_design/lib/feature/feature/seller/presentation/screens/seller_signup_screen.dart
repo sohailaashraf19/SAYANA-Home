@@ -7,7 +7,6 @@ import 'package:my_house_design/feature/feature/seller/logic/cubit/seller_regist
 import 'package:my_house_design/feature/feature/seller/presentation/screens/seller_login_screen.dart';
 import 'package:my_house_design/presentation/widgets/color.dart';
 
-
 class SellerSignUpScreen extends StatefulWidget {
   const SellerSignUpScreen({super.key});
 
@@ -26,6 +25,7 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  bool _acceptPolicy = false;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
         listener: (context, state) {
           if (state is SellerRegisterSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Registration successful')),
+              const SnackBar(content: Text('Registration successful')),
             );
             Navigator.pushReplacement(
               context,
@@ -66,7 +66,7 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                     ),
                   ),
                   leading: IconButton(
-                    color: const Color.fromARGB(255, 0, 0, 0),
+                    color: Colors.black,
                     icon: const Icon(Icons.arrow_back_ios),
                     onPressed: () => Navigator.pop(context),
                   ),
@@ -85,14 +85,16 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                 buildTextField(
                                   label: 'Brand Name',
                                   controller: _brandNameController,
-                                  validator: (value) => value!.isEmpty ? 'Brand name is required' : null,
+                                  validator: (value) =>
+                                      value!.isEmpty ? 'Brand name is required' : null,
                                 ),
                                 SizedBox(height: 16.h),
                                 buildTextField(
                                   label: 'Phone Number',
                                   controller: _phoneController,
                                   keyboardType: TextInputType.phone,
-                                  validator: (value) => value!.isEmpty ? 'Phone Number is required' : null,
+                                  validator: (value) =>
+                                      value!.isEmpty ? 'Phone number is required' : null,
                                 ),
                                 SizedBox(height: 16.h),
                                 buildTextField(
@@ -100,7 +102,9 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
                                   validator: (value) {
-                                    if (value == null || value.isEmpty) return 'Email is required';
+                                    if (value == null || value.isEmpty) {
+                                      return 'Email is required';
+                                    }
                                     if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
                                       return 'Enter a valid email';
                                     }
@@ -113,12 +117,16 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                   controller: _passwordController,
                                   obscureText: !_isPasswordVisible,
                                   suffixIcon: IconButton(
-                                    icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+                                    icon: Icon(_isPasswordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off),
                                     onPressed: () {
-                                      setState(() => _isPasswordVisible = !_isPasswordVisible);
+                                      setState(
+                                          () => _isPasswordVisible = !_isPasswordVisible);
                                     },
                                   ),
-                                  validator: (value) => value!.isEmpty ? 'Password is required' : null,
+                                  validator: (value) =>
+                                      value!.isEmpty ? 'Password is required' : null,
                                 ),
                                 SizedBox(height: 16.h),
                                 buildTextField(
@@ -126,16 +134,70 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                   controller: _confirmPasswordController,
                                   obscureText: !_isConfirmPasswordVisible,
                                   suffixIcon: IconButton(
-                                    icon: Icon(_isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off),
+                                    icon: Icon(_isConfirmPasswordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off),
                                     onPressed: () {
-                                      setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible);
+                                      setState(() => _isConfirmPasswordVisible =
+                                          !_isConfirmPasswordVisible);
                                     },
                                   ),
                                   validator: (value) {
-                                    if (value!.isEmpty) return 'Confirm Password is required';
-                                    if (value != _passwordController.text) return 'Passwords do not match';
+                                    if (value!.isEmpty) {
+                                      return 'Confirm password is required';
+                                    }
+                                    if (value != _passwordController.text) {
+                                      return 'Passwords do not match';
+                                    }
                                     return null;
                                   },
+                                ),
+                                // Professional policy agreement
+                                Padding(
+                                  padding: EdgeInsets.only(top: 12.h, left: 4.w, right: 4.w),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Checkbox(
+                                        value: _acceptPolicy,
+                                        activeColor: primaryColor,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _acceptPolicy = value ?? false;
+                                          });
+                                        },
+                                      ),
+                                      Expanded(
+                                        child: RichText(
+                                          text: TextSpan(
+                                            style: TextStyle(
+                                                fontSize: 14.sp, color: Colors.black87),
+                                            children: [
+                                              const TextSpan(
+                                                  text:
+                                                      'I acknowledge and accept that '),
+                                              TextSpan(
+                                                text: 'SYANA HOME ',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: primaryColor),
+                                              ),
+                                              const TextSpan(text: 'will retain '),
+                                              TextSpan(
+                                                text: '5% ',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                              const TextSpan(
+                                                text:
+                                                    'of my total sales as a platform service fee. This agreement is required to continue registration.',
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -147,12 +209,22 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                 ? const CircularProgressIndicator()
                                 : ElevatedButton(
                                     onPressed: () {
+                                      if (!_acceptPolicy) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  'Please accept the revenue‑sharing agreement to proceed.')),
+                                        );
+                                        return;
+                                      }
+
                                       if (_formKey.currentState!.validate()) {
                                         SellerRegisterCubit.get(context).registerSeller(
                                           phone: _phoneController.text,
                                           email: _emailController.text,
                                           password: _passwordController.text,
-                                          passwordConfirmation: _confirmPasswordController.text,
+                                          passwordConfirmation:
+                                              _confirmPasswordController.text,
                                           brandName: _brandNameController.text,
                                         );
                                       }
@@ -178,26 +250,18 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                             SizedBox(height: 16.h),
                             Text(
                               '───────or continue with───────',
-                              style: TextStyle(color: Colors.black, fontSize: 16.sp),
+                              style:
+                                  TextStyle(color: Colors.black54, fontSize: 16.sp),
                             ),
                             SizedBox(height: 16.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                IconButton(
-                                  icon: Image.asset('assets/images/apple.png', width: 40.w, height: 40.h),
-                                  onPressed: () {},
-                                ),
+                                _socialIcon('assets/images/apple.png'),
                                 SizedBox(width: 16.w),
-                                IconButton(
-                                  icon: Image.asset('assets/images/google.png', width: 40.w, height: 40.h),
-                                  onPressed: () {},
-                                ),
+                                _socialIcon('assets/images/google.png'),
                                 SizedBox(width: 16.w),
-                                IconButton(
-                                  icon: Image.asset('assets/images/facebook.png', width: 40.w, height: 40.h),
-                                  onPressed: () {},
-                                ),
+                                _socialIcon('assets/images/facebook.png'),
                               ],
                             ),
                             SizedBox(height: 16.h),
@@ -206,19 +270,19 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                               children: [
                                 Text(
                                   'Already have an account? ',
-                                  style: TextStyle(color: Colors.black, fontSize: 16.sp),
+                                  style: TextStyle(
+                                      color: Colors.black87, fontSize: 16.sp),
                                 ),
                                 GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const SellerLoginScreen()),
-                                    );
-                                  },
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => const SellerLoginScreen()),
+                                  ),
                                   child: Text(
                                     'Sign in',
                                     style: TextStyle(
-                                      color: Colors.black,
+                                      color: primaryColor,
                                       fontSize: 16.sp,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -259,6 +323,13 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
         suffixIcon: suffixIcon,
       ),
       validator: validator,
+    );
+  }
+
+  Widget _socialIcon(String assetPath) {
+    return IconButton(
+      icon: Image.asset(assetPath, width: 40.w, height: 40.h),
+      onPressed: () {},
     );
   }
 }
