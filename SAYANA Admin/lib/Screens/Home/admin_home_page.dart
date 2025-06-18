@@ -1,10 +1,16 @@
 import 'package:admin_sayana/Screens/Category_Manage/admin_category.dart';
 import 'package:admin_sayana/Screens/Find_User/admin_find_users_page.dart';
+import 'package:admin_sayana/Screens/Product/admin_product_page.dart';
+import 'package:admin_sayana/Screens/Reports/admin_report_page.dart';
+import 'package:admin_sayana/Screens/Voucher/admin_voucher_page.dart';
+import 'package:admin_sayana/Screens/Order/admin_order_page.dart';
+import 'package:admin_sayana/Screens/Login/login_page.dart';
 import 'package:admin_sayana/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'package:admin_sayana/globals.dart' as globals;
 
 class ProductImage {
   final int id;
@@ -53,9 +59,16 @@ class _HomePageState extends State<HomePage> {
   OverlayEntry? _overlayEntry;
   final LayerLink _layerLink = LayerLink();
 
+  int selectedDrawerIndex = 0;
+
+  // Admin profile data
+  String? adminName;
+  String? adminEmail;
+
   @override
   void initState() {
     super.initState();
+    fetchAdminProfile();
     fetchBuyers();
     fetchProducts();
     fetchSellers();
@@ -69,6 +82,41 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> fetchAdminProfile() async {
+    try {
+      final token = globals.globalToken ?? '';
+      print("adminprofile token: $token");
+      final response = await http.get(
+        Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/admin/adminprofile'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+      print("adminprofile status: ${response.statusCode}");
+      print("adminprofile body: ${response.body}");
+      if (!mounted) return;
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (!mounted) return;
+        setState(() {
+          adminName = data['name']?.toString() ?? 'Admin';
+          adminEmail = data['email']?.toString() ?? '';
+        });
+      } else {
+        if (!mounted) return;
+        setState(() {
+          adminName = 'Admin';
+        });
+      }
+    } catch (e) {
+      print("adminprofile exception: $e");
+      if (!mounted) return;
+      setState(() {
+        adminName = 'Admin';
+      });
+    }
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -77,14 +125,85 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  void onDrawerItemSelected(int index) {
+    setState(() {
+      selectedDrawerIndex = index;
+    });
+    switch (index) {
+      case 0:
+        Navigator.pop(context); // Home (stay here)
+        break;
+      case 1:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const AdminFindUserPage()));
+        break;
+      case 2:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const AdminCategory()));
+        break;
+      case 3:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ProductPage()));
+        break;
+      case 4:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const OrdersPage()));
+        break;
+      case 5:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ReportsPage()));
+        break;
+      case 6:
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const VouchersPage()));
+        break;
+      default:
+        Navigator.pop(context);
+    }
+  }
+
+  // ----------- Logout Function -----------
+  Future<void> logout() async {
+    try {
+      print("Logout button pressed");
+      print("Token before logout: ${globals.globalToken}");
+      final token = globals.globalToken ?? '';
+      final response = await http.post(
+        Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/admin/logout'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      print("Logout response status: ${response.statusCode}");
+      print("Logout response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        print("Logout successful, navigating to LoginPage");
+        globals.globalToken = null;
+        globals.globalAdminId = null;
+        if (!mounted) return;
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+          (route) => false,
+        );
+      } else {
+        print("Logout failed with status: ${response.statusCode}");
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Logout failed: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      print("Logout exception: $e");
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Logout failed: $e')),
+      );
+    }
+  }
+  // ---------------------------------------
+
   Future<void> fetchBuyers() async {
     try {
       final response = await http.get(
         Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/buyerstop'),
       );
-
+      if (!mounted) return;
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
+        if (!mounted) return;
         setState(() {
           buyers = data.cast<Map<String, dynamic>>();
           buyerIds = buyers.map((buyer) => buyer['buyer_id'] as int).toList();
@@ -94,6 +213,7 @@ class _HomePageState extends State<HomePage> {
         throw Exception('Failed to load buyers. Status: ${response.statusCode}');
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         isLoading = false;
       });
@@ -106,9 +226,10 @@ class _HomePageState extends State<HomePage> {
       final response = await http.get(
         Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/adminproducts'),
       );
-
+      if (!mounted) return;
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
+        if (!mounted) return;
         setState(() {
           products = data.cast<Map<String, dynamic>>();
           productCount = products.length;
@@ -126,12 +247,10 @@ class _HomePageState extends State<HomePage> {
       final response = await http.get(
         Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/sellerscount'),
       );
-
-      print('Sellers Count API Response Status: ${response.statusCode}');
-      print('Sellers Count API Response Body: ${response.body}');
-
+      if (!mounted) return;
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        if (!mounted) return;
         setState(() {
           sellerCount = data['total_sellers'] ?? 0;
         });
@@ -140,6 +259,7 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (e) {
       print('Error fetching seller count: $e');
+      if (!mounted) return;
       setState(() {
         sellerCount = 0;
       });
@@ -148,18 +268,17 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> fetchSalesAndRevenue() async {
     try {
+      if (!mounted) return;
       setState(() {
         isSalesAndRevenueLoading = true;
       });
       final response = await http.get(
         Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/revenueforadmin'),
       );
-
-      print('Sales and Revenue API Response Status: ${response.statusCode}');
-      print('Sales and Revenue API Response Body: ${response.body}');
-
+      if (!mounted) return;
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        if (!mounted) return;
         setState(() {
           totalSales = "${(double.tryParse(data['total_sales']?.toString() ?? '0') ?? 0).toStringAsFixed(2)} EGP";
           revenue = "${(double.tryParse(data['revenus']?.toString() ?? '0') ?? 0).toStringAsFixed(2)} EGP";
@@ -170,6 +289,7 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (e) {
       print('Error fetching sales and revenue: $e');
+      if (!mounted) return;
       setState(() {
         totalSales = "0 EGP";
         revenue = "0 EGP";
@@ -183,9 +303,10 @@ class _HomePageState extends State<HomePage> {
       final response = await http.get(
         Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/buyerscount'),
       );
-
+      if (!mounted) return;
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        if (!mounted) return;
         setState(() {
           customerCount = data['total_buyer'] ?? 0;
         });
@@ -194,6 +315,7 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (e) {
       print('Error fetching customer count: $e');
+      if (!mounted) return;
       setState(() {
         customerCount = 0;
       });
@@ -203,6 +325,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> fetchSearchResults(String query) async {
     if (query.isEmpty) {
       _removeOverlay();
+      if (!mounted) return;
       setState(() {
         searchResults.clear();
       });
@@ -213,9 +336,10 @@ class _HomePageState extends State<HomePage> {
       final response = await http.get(
         Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/search?query=$query'),
       );
-
+      if (!mounted) return;
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
+        if (!mounted) return;
         setState(() {
           searchResults = data.cast<Map<String, dynamic>>().map((item) {
             return {
@@ -226,10 +350,6 @@ class _HomePageState extends State<HomePage> {
                   [],
             };
           }).toList();
-          // Print the search results to debug image_url
-          for (var item in searchResults) {
-            print('Search Result: ${item['name']} - images: ${item['images']?.map((img) => img.imagePath).toList()}');
-          }
         });
         _showOverlay();
       } else {
@@ -249,12 +369,10 @@ class _HomePageState extends State<HomePage> {
     _overlayEntry = OverlayEntry(
       builder: (context) => GestureDetector(
         onTap: () {
-          // Close the overlay when tapping outside
           _removeOverlay();
         },
         child: Stack(
           children: [
-            // Transparent background to capture taps
             Positioned.fill(
               child: Container(
                 color: Colors.transparent,
@@ -297,7 +415,7 @@ class _HomePageState extends State<HomePage> {
                                           fit: BoxFit.cover,
                                           errorBuilder: (context, error, stackTrace) {
                                             return Image.asset(
-                                              'assets/img/placeholder.png', // تأكدي إن الصورة موجودة في المشروع
+                                              'assets/img/placeholder.png',
                                               width: 50,
                                               height: 50,
                                               fit: BoxFit.cover,
@@ -335,46 +453,101 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
+      drawer: Drawer(
+        child: Container(
+          color: primaryColor,
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 28,
+                      backgroundImage: AssetImage('assets/SYANA HOME.png'),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            adminName ?? '',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _buildDrawerTile(Icons.home, 'Home', 0),
+              _buildDrawerTile(Icons.person_search, 'Find Users', 1),
+              _buildDrawerTile(Icons.grid_view, 'Categories', 2),
+              _buildDrawerTile(Icons.shopping_bag, 'Products', 3),
+              _buildDrawerTile(Icons.receipt_long, 'Orders', 4),
+              _buildDrawerTile(Icons.bar_chart, 'Reports', 5),
+              _buildDrawerTile(Icons.card_giftcard, 'Vouchers', 6),
+              const Divider(color: Colors.white70),
+              ListTile(
+                leading: const Icon(Icons.logout, color: Colors.red),
+                title: const Text('Logout', style: TextStyle(color: Colors.red)),
+                onTap: logout,
+              ),
+            ],
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            // Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Hello Sohaila !',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
                   Row(
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.person_search),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const AdminFindUserPage()),
-                          );
-                        },
+                      Builder(
+                        builder: (context) => IconButton(
+                          icon: Icon(Icons.menu, color: primaryColor),
+                          onPressed: () => Scaffold.of(context).openDrawer(),
+                        ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.grid_view),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const AdminCategory()),
-                          );
-                        },
+                      const SizedBox(width: 8),
+                      CircleAvatar(
+                        backgroundColor: Colors.white,
+                        radius: 22,
+                        backgroundImage: AssetImage('assets/SYANA HOME.png'),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        adminName ?? '',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: primaryColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-
-            // 🔍 Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: CompositedTransformTarget(
@@ -397,8 +570,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // 📦 Stats
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -432,8 +603,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // 👥 Best Users
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -469,6 +638,17 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerTile(IconData icon, String title, int index) {
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        leading: Icon(icon, color: Colors.white),
+        title: Text(title, style: const TextStyle(color: Colors.white)),
+        onTap: () => onDrawerItemSelected(index),
       ),
     );
   }

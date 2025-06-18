@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:admin_sayana/theme/color.dart'; // تأكد أن هذا الملف يحتوي الألوان المطلوبة
+import 'package:admin_sayana/theme/color.dart';
+import 'package:admin_sayana/globals.dart' as globals;
+import 'package:admin_sayana/Screens/Home/admin_home_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -45,7 +47,6 @@ class _VouchersPageState extends State<VouchersPage> {
           vouchers = offers.map<Map<String, dynamic>>((offer) {
             return {
               'title': offer['title']?.toString() ?? '',
-              'description': offer['description']?.toString() ?? '',
               'discount': offer['discount']?.toString() ?? '',
               'start_date': offer['start_date']?.toString() ?? '',
               'end_date': offer['end_date']?.toString() ?? '',
@@ -67,16 +68,21 @@ class _VouchersPageState extends State<VouchersPage> {
   }
 
   Future<void> addVoucherToApi(Map<String, dynamic> voucherData) async {
+    if (globals.globalAdminId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Admin ID not set! Please login again.')),
+      );
+      return;
+    }
+
     final url = Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/addnewofferadmin');
     try {
       final response = await http.post(
         url,
-        body: voucherData,
-      );
-      debugPrint('Status: ${response.statusCode}');
-      debugPrint('Body: ${response.body}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Status: ${response.statusCode}\nBody: ${response.body}')),
+        body: {
+          ...voucherData,
+          'admin_id': globals.globalAdminId.toString(),
+        },
       );
       if (response.statusCode == 201 || response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -125,10 +131,12 @@ class _VouchersPageState extends State<VouchersPage> {
   Future<void> updateVoucherApi(String id, Map<String, dynamic> updatedData, int index) async {
     final url = Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/updateoffer/$id');
     try {
-      final response = await http.post(
+      final response = await http.put(
         url,
         body: updatedData,
       );
+      print('Update status: ${response.statusCode}');
+      print('Update response: ${response.body}');
       if (response.statusCode == 200) {
         setState(() {
           vouchers[index] = {
@@ -141,12 +149,13 @@ class _VouchersPageState extends State<VouchersPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Update failed!')),
+          SnackBar(content: Text('Update failed!\n${response.body}')),
         );
       }
     } catch (e) {
+      print('Update exception: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to connect to server')),
+        SnackBar(content: Text('Unable to connect to server\n$e')),
       );
     }
   }
@@ -223,7 +232,6 @@ class _VouchersPageState extends State<VouchersPage> {
 
   void showUpdateDialog(int index, Map<String, dynamic> voucher) {
     final TextEditingController titleController = TextEditingController(text: voucher['title']);
-    final TextEditingController descriptionController = TextEditingController(text: voucher['description']);
     final TextEditingController discountController = TextEditingController(text: voucher['discount']);
     final TextEditingController startDateController = TextEditingController(text: voucher['start_date']);
     final TextEditingController endDateController = TextEditingController(text: voucher['end_date']);
@@ -238,7 +246,6 @@ class _VouchersPageState extends State<VouchersPage> {
             child: Column(
               children: [
                 TextField(controller: titleController, decoration: const InputDecoration(labelText: 'Title')),
-                TextField(controller: descriptionController, decoration: const InputDecoration(labelText: 'Description')),
                 TextField(controller: discountController, decoration: const InputDecoration(labelText: 'Discount')),
                 TextField(controller: startDateController, decoration: const InputDecoration(labelText: 'Start Date')),
                 TextField(controller: endDateController, decoration: const InputDecoration(labelText: 'End Date')),
@@ -265,7 +272,6 @@ class _VouchersPageState extends State<VouchersPage> {
               onPressed: () {
                 final updatedData = {
                   'title': titleController.text,
-                  'description': descriptionController.text,
                   'discount': discountController.text,
                   'start_date': startDateController.text,
                   'end_date': endDateController.text,
@@ -289,9 +295,22 @@ class _VouchersPageState extends State<VouchersPage> {
         appBar: AppBar(
           backgroundColor: backgroundColor,
           elevation: 0,
-          title: const Vouchercustomappbar(
-            image: 'assets/SYANA HOME.png',
-            text: 'Vouchers',
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, size: 28, color: primaryColor),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => HomePage(onItemSelected: (_) {})),
+                (route) => false,
+              );
+            },
+          ),
+          title: const Text(
+            "Vouchers",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
           actions: [
             IconButton(
@@ -358,7 +377,6 @@ class Voucher_Detailed extends StatelessWidget {
     required this.startDate,
     required this.endDate,
     required this.onDelete,
-    required this.description,
     required this.img,
     required this.onUpdate,
   });
@@ -366,7 +384,6 @@ class Voucher_Detailed extends StatelessWidget {
   final String discount;
   final String startDate;
   final String endDate;
-  final String description;
   final String img;
   final VoidCallback onDelete;
   final VoidCallback onUpdate;
@@ -384,7 +401,6 @@ class Voucher_Detailed extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // صورة ممكن إضافتها لو حبيت
             const SizedBox(width: 0, height: 0),
             Expanded(
               child: Column(
@@ -395,12 +411,6 @@ class Voucher_Detailed extends StatelessWidget {
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  if (description.isNotEmpty && description != title)
-                    Text(
-                      description,
-                      style: const TextStyle(
-                          fontSize: 15, color: Colors.black87),
-                    ),
                   const SizedBox(height: 5),
                   Row(
                     children: [
@@ -481,7 +491,6 @@ class VoucherContainer extends StatelessWidget {
                 vouchers.length,
                 (index) => Voucher_Detailed(
                   title: vouchers[index]['title'] ?? '',
-                  description: vouchers[index]['description'] ?? '',
                   discount: vouchers[index]['discount'] ?? '',
                   startDate: vouchers[index]['start_date'] ?? '',
                   endDate: vouchers[index]['end_date'] ?? '',

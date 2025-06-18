@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:admin_sayana/theme/color.dart';
 import 'package:admin_sayana/main.dart';
-
+import 'package:admin_sayana/globals.dart' as globals;
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -15,21 +17,48 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
   bool isObscure = true;
 
-  void login() {
+  Future<void> login() async {
     setState(() {
       isLoading = true;
     });
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        isLoading = false;
-      });
+
+    final response = await http.post(
+      Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/admin/login'),
+      body: {
+        'email': emailController.text,
+        'password': passwordController.text,
+      },
+    );
+
+    setState(() {
+      isLoading = false;
+    });
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      String token = data['token'] ?? '';
+      int adminId = data['admin']['id'];
+      print("Login response token: $token");
+      globals.globalToken = token;
+      globals.globalAdminId = adminId; 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => const AdminMainPage(),
         ),
       );
-    });
+    } else {
+      String errorMsg = 'حدث خطأ! تأكد من البيانات';
+      try {
+        final data = jsonDecode(response.body);
+        if (data['message'] != null) {
+          errorMsg = data['message'];
+        }
+      } catch (e) {}
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMsg)),
+      );
+    }
   }
 
   @override
@@ -104,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 30),
                 Container(
-                  width: 250, 
+                  width: 250,
                   child: MaterialButton(
                     onPressed: isLoading ? null : login,
                     color: primaryColor,

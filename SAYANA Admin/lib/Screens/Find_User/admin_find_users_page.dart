@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:admin_sayana/theme/color.dart'; // backgroundColor, boxColor, primaryColor
+import 'package:admin_sayana/Screens/Home/admin_home_page.dart'; // تأكد من المسار الصحيح
 
 void main() {
   runApp(const MyApp());
@@ -108,7 +109,6 @@ class _AdminFindUserPageState extends State<AdminFindUserPage> {
 
       setState(() {
         users = [...buyers, ...sellers];
-        // عند تحميل المستخدمين لأول مرة، طبق الفلتر الأساسي
         applyFilter(selectedFilter);
         isLoading = false;
       });
@@ -130,7 +130,6 @@ class _AdminFindUserPageState extends State<AdminFindUserPage> {
       } else {
         filteredUsers = List<Map<String, dynamic>>.from(users);
       }
-      // لو في نص في البحث، طبقه على النتيجة بعد الفلترة
       if (_searchController.text.isNotEmpty) {
         searchUsers(_searchController.text, updateState: false);
       }
@@ -188,6 +187,27 @@ class _AdminFindUserPageState extends State<AdminFindUserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
+      appBar: AppBar(
+        backgroundColor: backgroundColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, size: 28, color: primaryColor),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => HomePage(onItemSelected: (_) {})),
+              (route) => false,
+            );
+          },
+        ),
+        title: const Text(
+          "Users",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -195,15 +215,9 @@ class _AdminFindUserPageState extends State<AdminFindUserPage> {
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
               child: Row(
                 children: [
-                  const CircleAvatar(
-                    radius: 25,
-                    backgroundImage: AssetImage('assets/SYANA HOME.png'),
-                  ),
+                  
                   const SizedBox(width: 10),
-                  const Text(
-                    'Users',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
+                  // تم نقل عنوان الصفحة للأب بار
                   const SizedBox(width: 50),
                   Expanded(
                     child: Container(
@@ -242,11 +256,6 @@ class _AdminFindUserPageState extends State<AdminFindUserPage> {
                           .toList(),
                       onChanged: (v) => v != null ? applyFilter(v) : null,
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black),
-                    onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),

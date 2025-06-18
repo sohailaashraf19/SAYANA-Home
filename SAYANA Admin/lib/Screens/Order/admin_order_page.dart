@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:admin_sayana/theme/color.dart';
+import 'package:admin_sayana/Screens/Home/admin_home_page.dart'; // تأكد من المسار الصحيح
 
 class OrdersPage extends StatefulWidget {
   const OrdersPage({super.key});
@@ -24,13 +24,11 @@ class _OrdersPageState extends State<OrdersPage> {
 
   Future<void> fetchOrders() async {
     try {
-      print('Starting fetchOrders...');
       final response = await http.get(
         Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/getAllorder'),
-      ).timeout(Duration(seconds: 10), onTimeout: () {
+      ).timeout(const Duration(seconds: 10), onTimeout: () {
         throw Exception('Request timed out');
       });
-      print('API Response: ${response.statusCode} - ${response.body}');
 
       if (response.statusCode == 200) {
         final dynamic responseData = jsonDecode(response.body);
@@ -101,7 +99,6 @@ class _OrdersPageState extends State<OrdersPage> {
         throw Exception('Failed to load orders: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error in fetchOrders: $e');
       String errorText;
       if (e.toString().contains('Request timed out')) {
         errorText = 'Request timed out. Please check your internet connection.';
@@ -123,32 +120,33 @@ class _OrdersPageState extends State<OrdersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor, // ← هنا تقدر تغير لون الخلفية
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        backgroundColor: backgroundColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, size: 28, color: primaryColor),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => HomePage(onItemSelected: (_) {})),
+              (route) => false,
+            );
+          },
+        ),
+        title: const Text(
+          "Orders",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
           child: CustomScrollView(
             slivers: [
-              SliverToBoxAdapter(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const CircleAvatar(
-                      radius: 30,
-                      backgroundImage: AssetImage('assets/SYANA HOME.png'),
-                    ),
-                    const Expanded(
-                      child: Center(
-                        child: Text(
-                          "Orders",
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               const SliverToBoxAdapter(child: SizedBox(height: 30)),
               SliverToBoxAdapter(
                 child: isLoading

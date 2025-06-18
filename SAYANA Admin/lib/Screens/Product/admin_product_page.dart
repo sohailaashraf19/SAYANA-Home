@@ -2,6 +2,7 @@ import 'package:admin_sayana/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:admin_sayana/Screens/Home/admin_home_page.dart';
 
 class Product {
   final int productId;
@@ -120,6 +121,42 @@ class _ProductPageState extends State<ProductPage> {
     }
   }
 
+  Future<void> deleteProduct(int productId, int index) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/delete_products/$productId'),
+      );
+      print("Delete response status: ${response.statusCode}");
+      print("Delete response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        setState(() {
+          products.removeAt(index);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Product deleted successfully"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to delete: ${response.statusCode}"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error deleting: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,19 +176,25 @@ class _ProductPageState extends State<ProductPage> {
                 const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundImage: AssetImage('assets/SYANA HOME.png'),
+              children: [
+                // Arrow Back Button
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, size: 28, color: primaryColor),
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => HomePage(onItemSelected: (_) {})),
+                      (route) => false,
+                    );
+                  },
                 ),
-                Text(
+                const Text(
                   "Products",
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(width: 40),
+                const SizedBox(width: 40),
               ],
             ),
           ),
@@ -245,22 +288,8 @@ class _ProductPageState extends State<ProductPage> {
                                                     ),
                                                     TextButton(
                                                       onPressed: () {
-                                                        setState(() {
-                                                          products
-                                                              .removeAt(index);
-                                                        });
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          const SnackBar(
-                                                            content: Text(
-                                                                "Product deleted successfully"),
-                                                            backgroundColor:
-                                                                Colors.red,
-                                                          ),
-                                                        );
+                                                        Navigator.of(context).pop();
+                                                        deleteProduct(product.productId, index);
                                                       },
                                                       child: const Text(
                                                         "Delete",

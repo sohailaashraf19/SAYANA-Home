@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:admin_sayana/theme/color.dart';
+import 'package:admin_sayana/Screens/Home/admin_home_page.dart'; // تأكد من المسار الصحيح
 
 class ReportsPage extends StatefulWidget {
   const ReportsPage({super.key});
@@ -36,7 +37,7 @@ class _ReportsPageState extends State<ReportsPage> {
                 'seller': p['seller_name']?.toString() ?? 'Unknown Seller',
                 'image_path': p['product_image']?.toString() ?? '',
                 'reportCount': p['reportcount'] ?? 0,
-                'seller_id': p['seller_id'] ?? 0, // ← Added seller_id
+                'seller_id': p['seller_id'] ?? 0,
               }).toList();
           isLoading = false;
         });
@@ -56,6 +57,27 @@ class _ReportsPageState extends State<ReportsPage> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: backgroundColor,
+        appBar: AppBar(
+          backgroundColor: backgroundColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, size: 28, color: primaryColor),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => HomePage(onItemSelected: (_) {})),
+                (route) => false,
+              );
+            },
+          ),
+          title: const Text(
+            "Reports",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
         body: Padding(
           padding: const EdgeInsets.all(15),
           child: isLoading
@@ -159,8 +181,7 @@ class ReportContainer extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text("Seller: ${seller ?? 'Unknown'}", overflow: TextOverflow.ellipsis),
                 Text("Seller ID: $sellerId", overflow: TextOverflow.ellipsis),
-                                Text("Reports: $reportCount", overflow: TextOverflow.ellipsis),
-
+                Text("Reports: $reportCount", overflow: TextOverflow.ellipsis),
               ],
             ),
           )

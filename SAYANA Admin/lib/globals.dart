@@ -1,0 +1,2 @@
+int? globalAdminId;
+String? globalToken;
