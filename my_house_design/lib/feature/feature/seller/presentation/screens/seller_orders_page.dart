@@ -96,9 +96,17 @@ class _SellerOrdersPageState extends State<SellerOrdersPage> {
           ? const Center(child: CircularProgressIndicator())
           : orders.isEmpty
               ? Center(
-                  child: Text(
-                    errorMessage.isEmpty ? 'No orders found' : errorMessage,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 40),
+                        Text(
+                          errorMessage.isEmpty ? 'No orders found' : errorMessage,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
                   ),
                 )
               : Padding(
@@ -107,29 +115,28 @@ class _SellerOrdersPageState extends State<SellerOrdersPage> {
                     itemCount: orders.length,
                     itemBuilder: (context, index) {
                       final order = orders[index];
-                      final buyerName = order['buyer']['name'];
-                      final totalPrice = order['total_price'];
-                      final paymentStatus = order['payment_status'];
-                      final orderItems = order['order_items'];
-                      final status = order['status'];
+                      final buyerName = order['buyer']?['name']?.toString() ?? '';
+                      final totalPrice = order['total_price']?.toString() ?? '';
+                      final paymentStatus = order['payment_status']?.toString() ?? '';
+                      final orderItems = order['order_items'] ?? [];
+                      final status = order['status']?.toString() ?? '';
 
                       String? imagePath;
-                      if (orderItems != null &&
-                          orderItems.isNotEmpty &&
+                      if (orderItems.isNotEmpty &&
                           orderItems[0]['product'] != null &&
                           orderItems[0]['product']['images'] != null &&
                           orderItems[0]['product']['images'].isNotEmpty) {
-                        imagePath = orderItems[0]['product']['images'][0]['image_path'];
+                        imagePath = orderItems[0]['product']['images'][0]['image_path']?.toString();
                       }
 
                       return GestureDetector(
                         onTap: () async {
-  await Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => OrderInfoPage(order: order)),
-  );
-  fetchOrders(); // ✅ يعيد تحميل الطلبات تلقائياً
-},
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => OrderInfoPage(order: order)),
+                          );
+                          fetchOrders(); // يعيد تحميل الطلبات تلقائياً
+                        },
                         child: OrderCard(
                           buyerName: buyerName,
                           totalPrice: totalPrice,
@@ -212,7 +219,7 @@ class OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String? fullImageUrl = imagePath != null
+    String? fullImageUrl = (imagePath != null && imagePath != '')
         ? 'https://olivedrab-llama-457480.hostingersite.com/$imagePath'
         : null;
 
@@ -235,19 +242,19 @@ class OrderCard extends StatelessWidget {
               ),
             ),
           const SizedBox(height: 8),
-          Text('Buyer: $buyerName', style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text('Total Price: $totalPrice EGP', style: const TextStyle(color: Colors.black54)),
-          Text('Payment Status: $paymentStatus', style: const TextStyle(color: Colors.black54)),
-          Text('Order Status: $status',
+          Text('Buyer: ${buyerName.isNotEmpty ? buyerName : "Unknown"}', style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text('Total Price: ${totalPrice.isNotEmpty ? totalPrice : "0"} EGP', style: const TextStyle(color: Colors.black54)),
+          Text('Payment Status: ${paymentStatus.isNotEmpty ? paymentStatus : "N/A"}', style: const TextStyle(color: Colors.black54)),
+          Text('Order Status: ${status.isNotEmpty ? status : "N/A"}',
               style: TextStyle(fontWeight: FontWeight.bold, color: _statusColor(status))),
           const SizedBox(height: 12),
           const Text('Order Items:', style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           ...orderItems.map((item) {
             final product = item['product'];
-            final productName = product['name'];
-            final quantity = item['quantity'];
-            final price = item['price'];
+            final productName = product?['name']?.toString() ?? 'N/A';
+            final quantity = item['quantity']?.toString() ?? '1';
+            final price = item['price']?.toString() ?? '0';
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Row(

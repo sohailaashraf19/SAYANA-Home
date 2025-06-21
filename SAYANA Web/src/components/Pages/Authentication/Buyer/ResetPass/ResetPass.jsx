@@ -132,7 +132,7 @@ export default function ResetPass() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0, transition: { delay: 0.2, duration: 0.5 } }}
           >
-            SAYANA Home
+            SYANA Home
           </motion.h1>
           <motion.h2
             className="text-xl font-bold text-[#003664] mb-6 text-left"

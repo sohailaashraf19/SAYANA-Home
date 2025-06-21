@@ -1,26 +1,32 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaFacebookF, FaGoogle, FaApple } from "react-icons/fa";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { EyeIcon, EyeSlashIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 const SellerSignup = () => {
   const navigate = useNavigate();
-  const [brandName, setBrandName] = useState(""); // Renamed to brandName for clarity
+  const [brandName, setBrandName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [error, setError] = useState(""); // State for error messages
-  const [loading, setLoading] = useState(false); // State for loading status
+  const [acceptPolicy, setAcceptPolicy] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
-    setLoading(true); // Set loading state
+    setError("");
+    setLoading(true);
 
-    // Client-side password confirmation check
+    if (!acceptPolicy) {
+      setError("You must accept the service fee agreement to continue.");
+      setLoading(false);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match!");
       setLoading(false);
@@ -30,9 +36,7 @@ const SellerSignup = () => {
     try {
       const response = await fetch("https://olivedrab-llama-457480.hostingersite.com/public/api/seller/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           brand_name: brandName,
           phone,
@@ -45,15 +49,11 @@ const SellerSignup = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Success: Store the token and seller data
-        localStorage.setItem("token", data.token); // Store token in localStorage
-        localStorage.setItem("seller", JSON.stringify(data.seller)); // Store seller data
-        console.log("Registration successful:", data);
-        navigate("/home"); // Navigate to home page
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("seller", JSON.stringify(data.seller));
+        navigate("/home");
       } else {
-        // Handle validation errors or other API errors
         if (response.status === 422) {
-          // Extract validation errors
           const errors = data.errors || {};
           const errorMessage = Object.values(errors).flat().join(", ");
           setError(errorMessage || "Registration failed. Please check your inputs.");
@@ -62,16 +62,24 @@ const SellerSignup = () => {
         }
       }
     } catch (err) {
-      // Handle network or other errors
       setError("Failed to connect to the server. Please try again.");
       console.error("Error:", err);
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex bg-[#FBFBFB]">
+      {/* Back Button */}
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="absolute top-4 left-4 bg-transparent text-white p-3 rounded-full shadow-md hover:opacity-80 transition z-20"
+      >
+        <ArrowLeftIcon className="h-5 w-5" />
+      </button>
+
       {/* Left Side Image */}
       <div className="w-1/2 bg-[#003664]">
         <img
@@ -84,7 +92,7 @@ const SellerSignup = () => {
       {/* Right Side Form */}
       <div className="w-1/2 bg-[#f3f4f6] flex items-start justify-center pt-20">
         <div className="bg-white p-12 rounded-2xl shadow-lg w-full max-w-xl min-h-[650px]">
-          <h1 className="text-3xl font-bold text-[#003664] mb-2 text-left">SAYANA Home</h1>
+          <h1 className="text-3xl font-bold text-[#003664] mb-2 text-left">SYANA Home</h1>
           <h2 className="text-xl font-bold text-[#003664] mb-6 text-left">Create an Account</h2>
 
           {/* Error Message */}
@@ -151,6 +159,7 @@ const SellerSignup = () => {
                   className="absolute right-4 top-2.5 text-gray-500"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={loading}
+                  tabIndex={-1}
                 >
                   {showPassword ? (
                     <EyeSlashIcon className="h-5 w-5" />
@@ -178,6 +187,7 @@ const SellerSignup = () => {
                   className="absolute right-4 top-2.5 text-gray-500"
                   onClick={() => setShowConfirm(!showConfirm)}
                   disabled={loading}
+                  tabIndex={-1}
                 >
                   {showConfirm ? (
                     <EyeSlashIcon className="h-5 w-5" />
@@ -188,13 +198,34 @@ const SellerSignup = () => {
               </div>
             </div>
 
+            {/* Policy Agreement Checkbox */}
+            <div className="flex items-start gap-3 pt-2">
+              <input
+                type="checkbox"
+                id="accept-policy"
+                checked={acceptPolicy}
+                onChange={(e) => setAcceptPolicy(e.target.checked)}
+                className="mt-1 accent-[#003664] w-5 h-5"
+                disabled={loading}
+                required
+              />
+              <label htmlFor="accept-policy" className="text-sm text-gray-700 select-none">
+                <span>
+                  I acknowledge and accept that{" "}
+                  <span className="font-bold text-[#003664]">SYANA HOME </span>
+                  will retain <span className="font-bold">5% </span>
+                  of my total sales as a platform service fee. This agreement is required to continue registration.
+                </span>
+              </label>
+            </div>
+
             {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-[#003664] text-white py-2 rounded-full font-semibold hover:bg-opacity-90 transition"
-              disabled={loading}
+              className={`w-full bg-[#003664] text-white py-2 rounded-full font-semibold hover:bg-opacity-90 transition ${!acceptPolicy ? "opacity-60 cursor-not-allowed" : ""}`}
+              disabled={loading || !acceptPolicy}
             >
-              {loading ? "Sign Up" : "Sign Up"}
+              {loading ? "Sign Up..." : "Sign Up"}
             </button>
           </form>
 

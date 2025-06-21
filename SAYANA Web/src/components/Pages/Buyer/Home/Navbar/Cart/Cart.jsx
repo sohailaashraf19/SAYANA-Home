@@ -148,7 +148,7 @@ function Cart() {
                   />
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-[#1F2937]">{item.name}</h3>
-                    <p className="text-gray-600">{item.price.toFixed(2)} L.E</p>
+                    <p className="text-gray-600">{item.price.toFixed(2)} EGP</p>
                   </div>
                   <div className="flex items-center space-x-3 mr-4">
                     <button
@@ -185,20 +185,12 @@ function Cart() {
           >
             <h2 className="text-xl font-semibold text-[#1F2937] mb-4">Order Summary</h2>
             <div className="space-y-3 text-gray-700">
-              <div className="flex justify-between">
-                <span>Shipping Fee</span>
-                <span className="font-medium">{shippingFee.toFixed(2)} L.E</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span className="font-medium">{subtotal.toFixed(2)} L.E</span>
-              </div>
               <div className="flex justify-between font-bold text-[#1F2937] pt-2 border-t border-gray-200">
                 <span>Total</span>
-                <span>{total.toFixed(2)} L.E</span>
+                <span>{subtotal.toFixed(2)} EGP</span>
               </div>
             </div>
-            <Link to="/buyer/checkout">
+            <Link to="/buyer/checkout" state={{ cartItems: cart }}>
               <button className="w-full mt-6 bg-[#003664] text-white py-3 rounded-full hover:bg-[#002a4f] transition-colors duration-300 font-semibold shadow-md">
                 Proceed to Checkout
               </button>

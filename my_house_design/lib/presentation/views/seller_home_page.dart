@@ -22,7 +22,6 @@ import 'package:my_house_design/presentation/widgets/color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_house_design/feature/feature/buyer/presentation/screens/botttomnavbar.dart';
 
-
 class SellerHomePage extends StatefulWidget {
   const SellerHomePage({super.key});
 
@@ -258,13 +257,14 @@ class SummaryCardsWidget extends StatelessWidget {
                       if (productState is ProductCountLoaded) {
                         final productCount = productState.data.productCount;
 
+                        // --- MODIFIED BLOCK: decrease aspectRatio & card height, fit text ---
                         return GridView(
                           padding: const EdgeInsets.all(16),
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                             crossAxisSpacing: 16,
                             mainAxisSpacing: 16,
-                            childAspectRatio: 1.3,
+                            childAspectRatio: 1.05, // was 1.3
                           ),
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -343,8 +343,10 @@ class SummaryCardsWidget extends StatelessWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      height: 110, // FIXED HEIGHT to avoid overflow
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
@@ -355,34 +357,33 @@ class SummaryCardsWidget extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             child: Icon(icon, color: iconColor, size: 28),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           Text(
             title.toUpperCase(),
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
               color: Color(0xFF003664),
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
     );
   }
 }
-
-
-
-
-          // لو عندك boxColor وغيره
 
 class TrendingProductsWidget extends StatelessWidget {
   const TrendingProductsWidget({super.key});
@@ -409,8 +410,6 @@ class TrendingProductsWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-
-              // ----------  العرض الأفقي للمنتجات  ----------
               SizedBox(
                 height: 200,
                 child: ListView.separated(
@@ -429,13 +428,12 @@ class TrendingProductsWidget extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // ----------  صورة المنتج  ----------
                           Expanded(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
                               child: product.imageUrl.isNotEmpty
                                   ? FadeInImage.assetNetwork(
-                                      placeholder: 'assets/images/placeholder.png', // ضيف placeholder عندك
+                                      placeholder: 'assets/images/placeholder.png',
                                       image: product.imageUrl,
                                       fit: BoxFit.cover,
                                       width: double.infinity,
@@ -446,8 +444,6 @@ class TrendingProductsWidget extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-
-                          // ----------  اسم المنتج وعدد المبيعات  ----------
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Column(
@@ -482,8 +478,6 @@ class TrendingProductsWidget extends StatelessWidget {
     );
   }
 }
-
-
 
 class HighestSpendingCustomersWidget extends StatelessWidget {
   const HighestSpendingCustomersWidget({super.key});

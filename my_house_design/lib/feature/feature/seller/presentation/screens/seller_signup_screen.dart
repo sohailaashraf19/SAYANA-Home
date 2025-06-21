@@ -21,7 +21,8 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
@@ -72,7 +73,8 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                   ),
                 ),
                 body: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 16.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 30.w, vertical: 16.h),
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -85,16 +87,18 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                 buildTextField(
                                   label: 'Brand Name',
                                   controller: _brandNameController,
-                                  validator: (value) =>
-                                      value!.isEmpty ? 'Brand name is required' : null,
+                                  validator: (value) => value!.isEmpty
+                                      ? 'Brand name is required'
+                                      : null,
                                 ),
                                 SizedBox(height: 16.h),
                                 buildTextField(
                                   label: 'Phone Number',
                                   controller: _phoneController,
                                   keyboardType: TextInputType.phone,
-                                  validator: (value) =>
-                                      value!.isEmpty ? 'Phone number is required' : null,
+                                  validator: (value) => value!.isEmpty
+                                      ? 'Phone number is required'
+                                      : null,
                                 ),
                                 SizedBox(height: 16.h),
                                 buildTextField(
@@ -105,7 +109,8 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                     if (value == null || value.isEmpty) {
                                       return 'Email is required';
                                     }
-                                    if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                                    if (!RegExp(r'\S+@\S+\.\S+')
+                                        .hasMatch(value)) {
                                       return 'Enter a valid email';
                                     }
                                     return null;
@@ -121,12 +126,14 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                         ? Icons.visibility
                                         : Icons.visibility_off),
                                     onPressed: () {
-                                      setState(
-                                          () => _isPasswordVisible = !_isPasswordVisible);
+                                      setState(() =>
+                                          _isPasswordVisible =
+                                              !_isPasswordVisible);
                                     },
                                   ),
-                                  validator: (value) =>
-                                      value!.isEmpty ? 'Password is required' : null,
+                                  validator: (value) => value!.isEmpty
+                                      ? 'Password is required'
+                                      : null,
                                 ),
                                 SizedBox(height: 16.h),
                                 buildTextField(
@@ -152,11 +159,13 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                     return null;
                                   },
                                 ),
-                                // Professional policy agreement
+                                // Revenue‑sharing agreement
                                 Padding(
-                                  padding: EdgeInsets.only(top: 12.h, left: 4.w, right: 4.w),
+                                  padding: EdgeInsets.only(
+                                      top: 12.h, left: 4.w, right: 4.w),
                                   child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Checkbox(
                                         value: _acceptPolicy,
@@ -171,7 +180,8 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                         child: RichText(
                                           text: TextSpan(
                                             style: TextStyle(
-                                                fontSize: 14.sp, color: Colors.black87),
+                                                fontSize: 14.sp,
+                                                color: Colors.black87),
                                             children: [
                                               const TextSpan(
                                                   text:
@@ -183,7 +193,7 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                                     color: primaryColor),
                                               ),
                                               const TextSpan(text: 'will retain '),
-                                              TextSpan(
+                                              const TextSpan(
                                                 text: '5% ',
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold),
@@ -210,16 +220,20 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                 : ElevatedButton(
                                     onPressed: () {
                                       if (!_acceptPolicy) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           const SnackBar(
-                                              content: Text(
-                                                  'Please accept the revenue‑sharing agreement to proceed.')),
+                                            content: Text(
+                                              'Please accept the revenue‑sharing agreement to proceed.',
+                                            ),
+                                          ),
                                         );
                                         return;
                                       }
 
                                       if (_formKey.currentState!.validate()) {
-                                        SellerRegisterCubit.get(context).registerSeller(
+                                        SellerRegisterCubit.get(context)
+                                            .registerSeller(
                                           phone: _phoneController.text,
                                           email: _emailController.text,
                                           password: _passwordController.text,
@@ -232,9 +246,11 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: primaryColor,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30.r),
+                                        borderRadius:
+                                            BorderRadius.circular(30.r),
                                       ),
-                                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 16.h),
                                     ),
                                     child: Center(
                                       child: Text(
@@ -247,24 +263,7 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                       ),
                                     ),
                                   ),
-                            SizedBox(height: 16.h),
-                            Text(
-                              '───────or continue with───────',
-                              style:
-                                  TextStyle(color: Colors.black54, fontSize: 16.sp),
-                            ),
-                            SizedBox(height: 16.h),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _socialIcon('assets/images/apple.png'),
-                                SizedBox(width: 16.w),
-                                _socialIcon('assets/images/google.png'),
-                                SizedBox(width: 16.w),
-                                _socialIcon('assets/images/facebook.png'),
-                              ],
-                            ),
-                            SizedBox(height: 16.h),
+                            SizedBox(height: 24.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -277,7 +276,8 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
                                   onTap: () => Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (_) => const SellerLoginScreen()),
+                                      builder: (_) => const SellerLoginScreen(),
+                                    ),
                                   ),
                                   child: Text(
                                     'Sign in',
@@ -319,17 +319,12 @@ class _SellerSignUpScreenState extends State<SellerSignUpScreen> {
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(25.r)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.r),
+        ),
         suffixIcon: suffixIcon,
       ),
       validator: validator,
-    );
-  }
-
-  Widget _socialIcon(String assetPath) {
-    return IconButton(
-      icon: Image.asset(assetPath, width: 40.w, height: 40.h),
-      onPressed: () {},
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:my_house_design/presentation/widgets/color.dart';
+import 'package:my_house_design/presentation/widgets/color.dart'; // backgroundColor & boxColor
 
 class EditProductScreen extends StatefulWidget {
   final String productId;
@@ -12,163 +12,196 @@ class EditProductScreen extends StatefulWidget {
   final String categoryId;
 
   const EditProductScreen({
-    Key? key,
+    super.key,
     required this.productId,
     required this.name,
     required this.description,
     required this.price,
     required this.quantity,
     required this.categoryId,
-  }) : super(key: key);
+  });
 
   @override
-  _EditProductScreenState createState() => _EditProductScreenState();
+  State<EditProductScreen> createState() => _EditProductScreenState();
 }
 
 class _EditProductScreenState extends State<EditProductScreen> {
-  late TextEditingController _nameController;
-  late TextEditingController _descriptionController;
-  late TextEditingController _priceController;
-  late TextEditingController _quantityController;
-  late TextEditingController _categoryController;
+  final _formKey = GlobalKey<FormState>();
 
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _descCtrl;
+  late final TextEditingController _priceCtrl;
+  late final TextEditingController _qtyCtrl;
+  late final TextEditingController _catIdCtrl;
+
+  /* -------------------- Lifecycle -------------------- */
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.name);
-    _descriptionController = TextEditingController(text: widget.description);
-    _priceController = TextEditingController(text: widget.price);
-    _quantityController = TextEditingController(text: widget.quantity);
-    _categoryController = TextEditingController(text: widget.categoryId);
+    _nameCtrl  = TextEditingController(text: widget.name);
+    _descCtrl  = TextEditingController(text: widget.description);
+    _priceCtrl = TextEditingController(text: widget.price);
+    _qtyCtrl   = TextEditingController(text: widget.quantity);
+    _catIdCtrl = TextEditingController(text: widget.categoryId);
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
-    _priceController.dispose();
-    _quantityController.dispose();
-    _categoryController.dispose();
+    _nameCtrl.dispose();
+    _descCtrl.dispose();
+    _priceCtrl.dispose();
+    _qtyCtrl.dispose();
+    _catIdCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _updateProduct() async {
-    try {
-      final response = await updateProduct(
-        productId: widget.productId,
-        name: _nameController.text,
-        description: _descriptionController.text,
-        price: _priceController.text,
-        quantity: _quantityController.text,
-        categoryId: _categoryController.text,
+  /* --------------------- Helpers --------------------- */
+  void _snack(String m, {bool err = false}) =>
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(m),
+          backgroundColor: err ? Colors.red[600] : Colors.green[600],
+        ),
       );
 
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+  Widget _cardField({
+    required IconData icon,
+    required String label,
+    required TextEditingController ctrl,
+    TextInputType kb = TextInputType.text,
+    int lines = 1,
+  }) {
+    return Card(
+      color: boxColor,
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(icon, color: const Color(0xFF003664), size: 22),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextFormField(
+                controller: ctrl,
+                keyboardType: kb,
+                maxLines: lines,
+                decoration: InputDecoration(
+                  labelText: label,
+                  border: InputBorder.none,
+                ),
+                validator: (v) =>
+                    v == null || v.isEmpty ? '$label is required' : null,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(responseData['message'] ?? 'Product updated successfully')),
-        );
-        Navigator.pop(context); // Close the edit screen after updating
+  /* --------------------- Network --------------------- */
+  Future<void> _updateProduct() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final uri = Uri.parse(
+        'https://olivedrab-llama-457480.hostingersite.com/public/api/update_product/${widget.productId}');
+    try {
+      final res = await http.put(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer YOUR_TOKEN', // replace if needed
+        },
+        body: jsonEncode({
+          "name"       : _nameCtrl.text,
+          "description": _descCtrl.text,
+          "price"      : _priceCtrl.text,
+          "quantity"   : _qtyCtrl.text,
+          "category_id": _catIdCtrl.text,
+        }),
+      );
+
+      final json = jsonDecode(res.body);
+      if (res.statusCode == 200) {
+        _snack(json['message'] ?? 'Product updated successfully');
+        Navigator.pop(context, true); // return to previous screen
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update product. Status: ${response.statusCode}')),
+        _snack(
+          json['message'] ?? 'Failed to update product (code ${res.statusCode})',
+          err: true,
         );
       }
     } catch (e) {
-      print('Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      _snack('Unexpected error: $e', err: true);
     }
   }
 
-  Future<http.Response> updateProduct({
-    required String productId,
-    required String name,
-    required String description,
-    required String price,
-    required String quantity,
-    required String categoryId,
-  }) async {
-    final url = Uri.parse(
-      'https://olivedrab-llama-457480.hostingersite.com/public/api/update_product/$productId',
-    );
-
-    try {
-      final response = await http.put(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer YOUR_TOKEN',  // Add your token if required
-        },
-        body: jsonEncode({
-          "name": name,
-          "description": description,
-          "price": price,
-          "quantity": quantity,
-          "category_id": categoryId,
-        }),
-      );
-      return response;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
+  /* ----------------------- UI ----------------------- */
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        
-        title: const Text('Edit Product'),
-        centerTitle: true,
-        backgroundColor: backgroundColor,
+        title: const Text('Edit Product', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF003664),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Product Name'),
-            ),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'Description'),
-            ),
-            TextField(
-              controller: _priceController,
-              decoration: const InputDecoration(labelText: 'Price'),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _quantityController,
-              decoration: const InputDecoration(labelText: 'Quantity'),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _categoryController,
-              decoration: const InputDecoration(labelText: 'Category ID'),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 400),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF003664),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                padding: EdgeInsets.symmetric(vertical: 16),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Modify product details',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
+
+              _cardField(icon: Icons.text_fields, label: 'Name', ctrl: _nameCtrl),
+              _cardField(
+                  icon: Icons.description,
+                  label: 'Description',
+                  ctrl: _descCtrl,
+                  lines: 3),
+              _cardField(
+                  icon: Icons.attach_money,
+                  label: 'Price',
+                  ctrl: _priceCtrl,
+                  kb: TextInputType.number),
+              _cardField(
+                  icon: Icons.numbers,
+                  label: 'Quantity',
+                  ctrl: _qtyCtrl,
+                  kb: TextInputType.number),
+              _cardField(
+                  icon: Icons.category,
+                  label: 'Category ID',
+                  ctrl: _catIdCtrl,
+                  kb: TextInputType.number),
+
+              const SizedBox(height: 20),
+
+              Center(
+                child: ElevatedButton(
+                  onPressed: _updateProduct,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF003664),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 30),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                  ),
+                  child: const Text('Update Product',
+                      style: TextStyle(fontSize: 16, color: Colors.white)),
+                ),
               ),
-              onPressed: _updateProduct,
-              child: const Text(
-                'Update Product',
-                style: TextStyle(color: Colors.white,fontSize: 18),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

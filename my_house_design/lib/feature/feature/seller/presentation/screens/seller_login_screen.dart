@@ -4,15 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_house_design/feature/feature/seller/data/repositories/seller_auth_repo.dart';
 import 'package:my_house_design/feature/feature/seller/logic/cubit/seller_login_cubit.dart';
 import 'package:my_house_design/feature/feature/seller/logic/cubit/seller_login_state.dart';
-import 'package:my_house_design/feature/feature/seller/presentation/screens/ForgtpassScreen.dart' show ForgtpassScreen;
+import 'package:my_house_design/feature/feature/seller/presentation/screens/ForgtpassScreen.dart'
+    show ForgtpassScreen;
 import 'package:my_house_design/feature/feature/seller/presentation/screens/seller_signup_screen.dart';
 import 'package:my_house_design/feature/feature/buyer/presentation/screens/choose_role_screen.dart';
 import 'package:my_house_design/presentation/widgets/color.dart';
 import 'package:my_house_design/presentation/views/seller_home_page.dart';
-
-
-
-
 
 class SellerLoginScreen extends StatefulWidget {
   const SellerLoginScreen({super.key});
@@ -36,18 +33,15 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
       create: (_) => SellerLoginCubit(SellerAuthRepo()),
       child: BlocConsumer<SellerLoginCubit, SellerLoginState>(
         listener: (context, state) {
-         if (state is SellerLoginSuccess) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(state.seller.message)),
-  );
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const SellerHomePage(),
-    ),
-  );
-}
- else if (state is SellerLoginFailure) {
+          if (state is SellerLoginSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.seller.message)),
+            );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const SellerHomePage()),
+            );
+          } else if (state is SellerLoginFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.error)),
             );
@@ -63,25 +57,23 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
               title: Text(
                 'Login',
                 style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold),
+                  color: Colors.black,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               backgroundColor: backgroundColor,
-                            leading: IconButton(
-  icon: Icon(
-    Icons.arrow_back,
-    color: const Color.fromARGB(255, 0, 0, 0), // Set the color of the back arrow to white
-  ),
-  onPressed: () =>  Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ChooseRoleScreen(), // أو BuyerHomeScreen لو حابب
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ChooseRoleScreen(),
+                  ),
+                ),
               ),
-            )
-),
             ),
-            backgroundColor:backgroundColor, //const Color.fromARGB(255, 255, 255, 255),
+            backgroundColor: backgroundColor,
             body: Center(
               child: SingleChildScrollView(
                 child: Column(
@@ -95,6 +87,7 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
+                    // Email field
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 40.w),
                       child: Container(
@@ -110,14 +103,14 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
                             decoration: const InputDecoration(
                               border: InputBorder.none,
                               hintText: 'Email',
-                              prefixIcon:
-                                  Icon(Icons.email, color: Colors.grey),
+                              prefixIcon: Icon(Icons.email, color: Colors.grey),
                             ),
                           ),
                         ),
                       ),
                     ),
                     SizedBox(height: 15.h),
+                    // Password field
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 40.w),
                       child: Container(
@@ -134,8 +127,8 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: 'Password',
-                              prefixIcon: const Icon(Icons.lock,
-                                  color: Colors.grey),
+                              prefixIcon:
+                                  const Icon(Icons.lock, color: Colors.grey),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _isObscure
@@ -144,9 +137,7 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
                                   color: Colors.grey,
                                 ),
                                 onPressed: () {
-                                  setState(() {
-                                    _isObscure = !_isObscure;
-                                  });
+                                  setState(() => _isObscure = !_isObscure);
                                 },
                               ),
                             ),
@@ -154,7 +145,8 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 10.h),
+                    // Remember‑me & forgot‑password row
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 30.w),
                       child: Row(
@@ -164,18 +156,16 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
                             children: [
                               Checkbox(
                                 value: _isRememberMe,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _isRememberMe = value!;
-                                  });
-                                },
                                 activeColor: primaryColor,
+                                onChanged: (value) {
+                                  setState(() => _isRememberMe = value!);
+                                },
                               ),
                               Text(
                                 'Remember me',
                                 style: TextStyle(
-                                  color: Colors.black,
                                   fontSize: 14.sp,
+                                  color: Colors.black,
                                 ),
                               ),
                             ],
@@ -185,15 +175,14 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ForgtpassScreen()),
+                                    builder: (_) => const ForgtpassScreen()),
                               );
                             },
                             child: Text(
                               'Forget Password?',
                               style: TextStyle(
-                                color: Colors.black,
                                 fontSize: 14.sp,
+                                color: Colors.black,
                                 decoration: TextDecoration.underline,
                               ),
                             ),
@@ -201,7 +190,8 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 10.h),
+                    // Sign‑in button
                     SizedBox(
                       width: 250.w,
                       height: 50.h,
@@ -219,9 +209,7 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
                           );
                         },
                         child: state is SellerLoginLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
+                            ? const CircularProgressIndicator(color: Colors.white)
                             : Text(
                                 'Sign In',
                                 style: TextStyle(
@@ -232,38 +220,7 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
                       ),
                     ),
                     SizedBox(height: 50.h),
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: Divider(thickness: 1, color: Colors.black),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10.w),
-                          child: Text(
-                            'or continue with',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                        const Expanded(
-                          child: Divider(thickness: 1, color: Colors.black),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset('assets/images/apple.png', height: 40.h),
-                        SizedBox(width: 20.w),
-                        Image.asset('assets/images/facebook.png', height: 40.h),
-                        SizedBox(width: 20.w),
-                        Image.asset('assets/images/google.png', height: 40.h),
-                      ],
-                    ),
-                    SizedBox(height: 5),
+                    // Sign‑up prompt
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -279,8 +236,7 @@ class _SellerLoginScreenState extends State<SellerLoginScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      const SellerSignUpScreen()),
+                                  builder: (_) => const SellerSignUpScreen()),
                             );
                           },
                           child: Text(

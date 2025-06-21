@@ -49,6 +49,7 @@ class _AdminFindUserPageState extends State<AdminFindUserPage> {
 
   Future<void> fetchUsers() async {
     try {
+      /* -----------------  Buyers  ----------------- */
       final buyersResponse = await http.get(
         Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/getAllBuyers'),
       );
@@ -78,6 +79,7 @@ class _AdminFindUserPageState extends State<AdminFindUserPage> {
         throw Exception('Failed to load buyers: ${buyersResponse.statusCode}');
       }
 
+      /* -----------------  Sellers  ----------------- */
       final sellersResponse = await http.get(
         Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/allseller'),
       );
@@ -120,6 +122,8 @@ class _AdminFindUserPageState extends State<AdminFindUserPage> {
     }
   }
 
+  /* -----------------  Filters & Search  ----------------- */
+
   void applyFilter(String filter) {
     setState(() {
       selectedFilter = filter;
@@ -158,30 +162,7 @@ class _AdminFindUserPageState extends State<AdminFindUserPage> {
     if (updateState) setState(() {});
   }
 
-  Future<void> sendUserAction(int userId, String userType) async {
-    try {
-      final response = await http.post(
-        Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/allseller'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'buyer_id': 35, 'product_id': 1}),
-      );
-
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$userType $userId action sent successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        throw Exception('Failed: ${response.statusCode}');
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error sending action: $e')),
-      );
-    }
-  }
+  /* -----------------  UI  ----------------- */
 
   @override
   Widget build(BuildContext context) {
@@ -211,14 +192,12 @@ class _AdminFindUserPageState extends State<AdminFindUserPage> {
       body: SafeArea(
         child: Column(
           children: [
+            /* -----------------  Search & Filter  ----------------- */
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
               child: Row(
                 children: [
-                  
                   const SizedBox(width: 10),
-                  // تم نقل عنوان الصفحة للأب بار
-                  const SizedBox(width: 50),
                   Expanded(
                     child: Container(
                       height: 40,
@@ -261,6 +240,8 @@ class _AdminFindUserPageState extends State<AdminFindUserPage> {
               ),
             ),
             const SizedBox(height: 10),
+
+            /* -----------------  List  ----------------- */
             Expanded(
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
@@ -282,32 +263,7 @@ class _AdminFindUserPageState extends State<AdminFindUserPage> {
                                     Text('Email: ${u['email']}'),
                                     if (u['phone'] != null) Text('Phone: ${u['phone']}'),
                                     Text('Account Type: ${u['type']}'),
-                                    Text('Report Number: ${u['reports']}'),
-                                    if (u['type'] == 'Seller') ...[
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          TextButton.icon(
-                                            onPressed: () {
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text('User has been deactivated'),
-                                                  backgroundColor: Colors.red,
-                                                ),
-                                              );
-                                              sendUserAction(u['id'], u['type']);
-                                            },
-                                            icon: const Icon(Icons.cancel, color: Colors.red),
-                                            label: const Text('Deactivate',
-                                                style: TextStyle(color: Colors.grey)),
-                                            style: ElevatedButton.styleFrom(backgroundColor: boxColor).copyWith(
-                                              overlayColor: MaterialStateProperty.all(Colors.blue.withOpacity(0.2)),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                    // Deactivate button removed as requested
                                   ],
                                 ),
                               ),

@@ -7,6 +7,7 @@ import 'package:my_house_design/feature/feature/buyer/presentation/screens/all_c
 import 'dart:convert';
 
 import 'package:my_house_design/feature/feature/buyer/presentation/screens/botttomnavbar.dart';
+import 'package:my_house_design/presentation/widgets/color.dart';
 import 'package:my_house_design/presentation/widgets/home_screen.dart';
 import 'package:my_house_design/feature/feature/buyer/presentation/screens/wishlistpage.dart';
 
@@ -234,6 +235,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: const Color(0xFF003664),
         leading: IconButton(
@@ -343,6 +345,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _postComment,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: boxColor, 
+                foregroundColor: primaryColor,
+              ),
               child: Text('Submit Comment'),
             ),
             const SizedBox(height: 16),

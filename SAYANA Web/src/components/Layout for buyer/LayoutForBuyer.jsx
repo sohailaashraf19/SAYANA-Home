@@ -3,45 +3,8 @@ import { Outlet } from "react-router-dom";
 import SayanaNav from "../Pages/Buyer/Home/Navbar/Navbar.jsx";
 import ChatIcon from "../Pages/Buyer/ChatIcon/ChatIcon.jsx";
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa";
-
-// أيقونات فيزا وماستر كارد بألوانهم الرسمية
-const VisaIcon = () => (
-  <svg
-    width="40"
-    height="24"
-    viewBox="0 0 40 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="inline-block"
-  >
-    <rect width="40" height="24" fill="#1A1F71" />
-    <text
-      x="20"
-      y="17"
-      fill="white"
-      fontSize="14"
-      fontWeight="bold"
-      textAnchor="middle"
-      fontFamily="Arial, sans-serif"
-    >
-      VISA
-    </text>
-  </svg>
-);
-
-const MasterCardIcon = () => (
-  <svg
-    width="40"
-    height="24"
-    viewBox="0 0 40 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="inline-block"
-  >
-    <circle cx="14" cy="12" r="10" fill="#EB001B" />
-    <circle cx="26" cy="12" r="10" fill="#F79E1B" fillOpacity="0.9" />
-  </svg>
-);
+import { Link } from "react-router-dom";
+import InstaPayIcon from "../Pages/buyer/Footer/InstaPayIcon.jsx";
 
 function Layout() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,10 +12,7 @@ function Layout() {
   const [cart, setCart] = useState([]);
 
   const currentYear = new Date().getFullYear();
-
-  // اللون الجديد بدل النص الأسود
   const chatIconColor = "#003664";
-  // لون رمادي أغمق من السابق
   const darkGray = "#4B5563";
 
   return (
@@ -79,25 +39,24 @@ function Layout() {
               Useful links
             </h3>
             <ul className="space-y-2" style={{ color: darkGray }}>
-
               <li>
-                <a href="#" className="hover:underline">
-                  SAYANA shopping app
+                <a href="/buyer/syana-shopping-app" className="hover:underline" style={{ color: darkGray }}>
+                  SYANA shopping app
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/planning-tools" className="hover:underline" style={{ color: darkGray }}>
                   Planning tools
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/stores" className="hover:underline" style={{ color: darkGray }}>
                   Stores
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
-                  SAYANA Family
+                <a href="/buyer/syana-family" className="hover:underline" style={{ color: darkGray }}>
+                  SYANA Family
                 </a>
               </li>
             </ul>
@@ -113,42 +72,42 @@ function Layout() {
             </h3>
             <ul className="space-y-2" style={{ color: darkGray }}>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/terms" className="hover:underline" style={{ color: darkGray }}>
                   Terms and conditions
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/guarantees-warranties" className="hover:underline" style={{ color: darkGray }}>
                   Guarantees & warranties
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/spareparts" className="hover:underline" style={{ color: darkGray }}>
                   Spare parts
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/about-services" className="hover:underline" style={{ color: darkGray }}>
                   About services
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/about-shopping" className="hover:underline" style={{ color: darkGray }}>
                   About shopping
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/return-policy" className="hover:underline" style={{ color: darkGray }}>
                   Return policy
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/contactus" className="hover:underline" style={{ color: darkGray }}>
                   Contact us
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/FAQ" className="hover:underline" style={{ color: darkGray }}>
                   FAQ
                 </a>
               </li>
@@ -161,32 +120,32 @@ function Layout() {
               className="font-semibold mb-4"
               style={{ color: chatIconColor }}
             >
-              This is SAYANA
+              This is SYANA
             </h3>
             <ul className="space-y-2" style={{ color: darkGray }}>
               <li>
-                <a href="#" className="hover:underline">
-                  About SAYANA
+                <a href="/buyer/about-syana" className="hover:underline" style={{ color: darkGray }}>
+                  About SYANA
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/democratic-design" className="hover:underline" style={{ color: darkGray }}>
                   Democratic design
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/sustainable-everyday" className="hover:underline" style={{ color: darkGray }}>
                   Sustainable everyday
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/community-engagement" className="hover:underline" style={{ color: darkGray }}>
                   Community engagement
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
-                  Working at SAYANA
+                <a href="/buyer/working-at-syana" className="hover:underline" style={{ color: darkGray }}>
+                  Working at SYANA
                 </a>
               </li>
             </ul>
@@ -202,19 +161,13 @@ function Layout() {
             </h3>
             <ul className="space-y-2" style={{ color: darkGray }}>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/buyer/product-recall" className="hover:underline" style={{ color: darkGray }}>
                   Product recalls
                 </a>
               </li>
-             
               <li>
-                <a href="#" className="hover:underline">
-                  VISA
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:underline">
-                  MasterCard
+                <a href="/buyer/instapay" className="hover:underline" style={{ color: darkGray }}>
+                  InstaPay
                 </a>
               </li>
             </ul>
@@ -251,10 +204,9 @@ function Layout() {
             </a>
           </div>
 
-          {/* أيقونات فيزا وماستر كارد */}
+          {/* أيقونة InstaPay فقط */}
           <div className="flex space-x-4 items-center">
-            <VisaIcon />
-            <MasterCardIcon />
+            <InstaPayIcon width={90} height={42} />
           </div>
 
           {/* Bottom Links */}
@@ -264,13 +216,13 @@ function Layout() {
           >
             <span>EG | English</span>
             <span>© SAYANA Home {currentYear}</span>
-            <a href="/privacy" className="hover:underline" style={{ color: darkGray }}>
+            <Link to="/buyer/privacy-policy" className="hover:underline" style={{ color: darkGray }}>
               Privacy policy
-            </a>
-            <a href="/cookie-policy" className="hover:underline" style={{ color: darkGray }}>
+            </Link>
+            <a href="/buyer/cookie-policy" className="hover:underline" style={{ color: darkGray }}>
               Cookie policy
             </a>
-            <a href="/terms" className="hover:underline" style={{ color: darkGray }}>
+            <a href="/buyer/terms" className="hover:underline" style={{ color: darkGray }}>
               Terms and conditions
             </a>
           </div>

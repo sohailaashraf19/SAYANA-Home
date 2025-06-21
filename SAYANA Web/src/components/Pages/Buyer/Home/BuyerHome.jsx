@@ -58,9 +58,9 @@ function Home() {
       image: sofa,
       alt: "Interior Design Living Room",
       buttons: [
-        { text: "livingroom&sofa", bottom: "28%", left: "85%", onClick: () => navigate(`/buyer/category/${getCategoryRoute("livingroom&sofa")}`) },
-        { text: "livingroom&sofa", bottom: "36%", left: "67%", onClick: () => navigate(`/buyer/category/${getCategoryRoute("livingroom&sofa")}`) },
-        { text: "Chair", bottom: "13%", left: "71%", onClick: () => navigate(`/buyer/category/${getCategoryRoute("chair")}`) },
+        { text: "Living Room", bottom: "28%", left: "85%", onClick: () => navigate(`/buyer/category/${getCategoryRoute("Living Room")}`) },
+        { text: "Living Room", bottom: "36%", left: "67%", onClick: () => navigate(`/buyer/category/${getCategoryRoute("Living Room")}`) },
+        { text: "Chairs", bottom: "13%", left: "71%", onClick: () => navigate(`/buyer/category/${getCategoryRoute("chairs")}`) },
         { text: "lighter", bottom: "47%", left: "31%", onClick: () => navigate(`/buyer/category/${getCategoryRoute("lighter")}`) },
         { text: "House_decore", bottom: "46%", left: "21%", onClick: () => navigate(`/buyer/category/${getCategoryRoute("House_decore")}`) },
         { text: "House_decore", bottom: "55%", left: "73%", onClick: () => navigate(`/buyer/category/${getCategoryRoute("House_decore")}`) },
@@ -541,9 +541,9 @@ function Home() {
                     <h3 className="text-lg font-bold">{item.name}</h3>
                     <p className="text-sm mt-1 truncate">{item.description}</p>
                     <div className="flex items-center mt-2">
-                      <span className="text-md sm:text-lg font-bold text-blue-700">{discountedPrice} L.E</span>
+                      <span className="text-md sm:text-lg font-bold text-blue-700">{discountedPrice} EGP</span>
                       {item.discount > 0 && (
-                        <span className="text-sm text-gray-500 line-through ml-2">{parseFloat(item.price).toFixed(2)} L.E</span>
+                        <span className="text-sm text-gray-500 line-through ml-2">{parseFloat(item.price).toFixed(2)} EGP</span>
                       )}
                     </div>
                   </div>

@@ -1,9 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "/src/components/ui/card.jsx";
-import Sidebar from "../Sidebar/Sidebar";
 import { TrashIcon, PencilIcon } from '@heroicons/react/24/solid';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
+
+const spinnerVariants = {
+  animate: {
+    rotate: 360,
+    scale: [1, 1.2, 1],
+    transition: {
+      rotate: { repeat: Infinity, duration: 1, ease: "linear" },
+      scale: { repeat: Infinity, duration: 0.8, ease: "easeInOut" },
+    },
+  },
+};
 
 const Product = () => {
   const navigate = useNavigate();
@@ -103,29 +114,56 @@ const Product = () => {
 
   return (
     <div className="flex h-screen bg-[#FBFBFB]">
-      <Sidebar />
       <main className="flex-1 p-6 overflow-y-scroll">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Products</h1>
           <button
             onClick={handleAddProductClick}
-            className="bg-[#003664] text-white px-4 py-2 rounded-full hover:bg-[#003664] hover:bg-opacity-80 transition"
+            className="px-6 py-2 bg-[#003664] text-white font-bold text-base rounded-full shadow-lg transform transition-transform duration-300 hover:scale-110 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 animate-pulse-professional"
           >
             Add Product
           </button>
         </div>
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : error ? (
+        {/* Loader */}
+        <AnimatePresence>
+          {loading && (
+            <motion.div
+              className="flex justify-center items-center h-64"
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+            >
+              <motion.div
+                className="relative h-20 w-20"
+                variants={spinnerVariants}
+                animate="animate"
+              >
+                <div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: "linear-gradient(45deg, #003664, #4a90e2)",
+                    boxShadow: "0 0 15px rgba(0, 54, 100, 0.5)",
+                  }}
+                />
+                <div className="absolute inset-2 rounded-full bg-gray-100" />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {error ? (
           <p>Error: {error}</p>
-        ) : (
+        ) : !loading && (
           <div className="grid grid-cols-3 gap-4">
             {products.map((product) => (
               <Card
                 key={product.product_id}
-                className="p-4 relative bg-[#EFF4F7] transition-transform transform hover:scale-105 hover:translate-y-[-10px]"
+                className="p-4 relative bg-[#EFF4F7] transition-transform transform hover:scale-105 hover:translate-y-[-10px] h-[440px] flex flex-col"
+                style={{ minHeight: "440px", maxHeight: "440px" }} // يمكنك تغير الرقم حسب ما يناسبك
               >
+                {/* أزرار الحذف والتعديل */}
                 <button
                   className="absolute top-4 right-2 bg-red-500 p-2 rounded-full text-white opacity-80"
                   onClick={() => openConfirmModal(product.product_id)}
@@ -138,30 +176,39 @@ const Product = () => {
                 >
                   <PencilIcon className="w-6 h-6" />
                 </button>
-                <CardContent className="flex flex-col items-center">
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-50 h-50 object-cover mb-4 max-w-full max-h-48 rounded-lg border border-gray-200"
-                    onError={(e) => {
-                      e.target.src = "https://via.placeholder.com/128";
-                    }}
-                  />
-                  <div className="text-[#201A23] font-semibold text-lg mt-2 mb-1">{product.price} LE</div>
-                  <div className="text-gray-800 font-semibold text-center h-14 overflow-hidden text-ellipsis line-clamp-2">
-                    {product.name}
+                {/* محتوى الكارت */}
+                <CardContent className="flex flex-col flex-1 justify-between items-center p-0">
+                  <div className="flex flex-col items-center w-full">
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="w-40 h-40 object-cover mb-2 max-w-full max-h-40 rounded-lg border border-gray-200"
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/128";
+                      }}
+                    />
+                    <div className="text-[#201A23] font-semibold text-lg mt-1 mb-1">{product.price} LE</div>
+                    <div className="text-gray-800 font-semibold text-center h-12 overflow-hidden text-ellipsis line-clamp-2">
+                      {product.name}
+                    </div>
+                    {/* وصف المنتج مع سطرين فقط */}
+                    <div
+                      className="text-gray-500 text-sm mb-2 mt-1 text-center h-10 overflow-hidden text-ellipsis"
+                      style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        whiteSpace: 'normal',
+                      }}
+                    >
+                      {product.description}
+                    </div>
                   </div>
-                  <div className="text-gray-500 text-sm mb-2">{product.description}</div>
+                  {/* معلومات المخزون والطلبات */}
                   <div className="flex justify-between w-full text-sm text-gray-600 mt-2">
                     <div className="flex flex-col items-center">
                       <div className="font-semibold">{product.quantity}</div>
                       <div>Stocks</div>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div className="flex items-center">
-                        <span className="text-yellow-500 mr-1">⭐</span>
-                        <span className="text-sm font-semibold">{product.reportcount || 0}</span>
-                      </div>
                     </div>
                     <div className="flex flex-col items-center">
                       <div className="font-semibold">{product.sales_count}</div>
@@ -197,6 +244,25 @@ const Product = () => {
           </div>
         </div>
       )}
+
+      {/* Button animation style */}
+      <style>
+        {`
+          @keyframes pulse-professional {
+            0%, 100% {
+              transform: scale(1);
+              box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+            }
+            50% {
+              transform: scale(1.05);
+              box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+            }
+          }
+          .animate-pulse-professional {
+            animation: pulse-professional 2.5s infinite;
+          }
+        `}
+      </style>
     </div>
   );
 };

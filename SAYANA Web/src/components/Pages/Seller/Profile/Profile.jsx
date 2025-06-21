@@ -11,6 +11,8 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false); // لحالة اللودر عند الحفظ
+  const [success, setSuccess] = useState(""); // رسالة نجاح
 
   // Fetch profile data on component mount
   useEffect(() => {
@@ -18,9 +20,7 @@ const Profile = () => {
       try {
         setLoading(true);
         setError("");
-
-        const token = localStorage.getItem("token"); // ← حطي التوكن هنا بعد تسجيل الدخول
-
+        const token = localStorage.getItem("token");
         const response = await axios.get(
           "https://olivedrab-llama-457480.hostingersite.com/public/api/seller/profile",
           {
@@ -30,16 +30,13 @@ const Profile = () => {
             },
           }
         );
-
         setProfile(response.data);
       } catch (err) {
-        console.error(err);
         setError("Failed to load profile data");
       } finally {
         setLoading(false);
       }
     };
-
     fetchProfile();
   }, []);
 
@@ -48,9 +45,41 @@ const Profile = () => {
     setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSaveProfile = () => {
-    setIsModalOpen(false);
-    alert("Profile updated successfully");
+  // تحديث البروفايل بالـ API
+  const handleSaveProfile = async () => {
+    setSaving(true);
+    setError("");
+    setSuccess("");
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(
+        "https://olivedrab-llama-457480.hostingersite.com/public/api/seller/profile",
+        {
+          brand_name: profile.brand_name,
+          email: profile.email,
+          phone: profile.phone,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+      setSuccess("Profile updated successfully");
+      setIsModalOpen(false);
+      // يمكنكِ إعادة جلب البيانات من السيرفر للتحديث الفعلي:
+      // يفضل تحديث الـ profile مباشرة
+      // أو يمكنكِ إعادة تشغيل fetchProfile هنا لو أردتِ
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+        err?.response?.data?.errors?.[Object.keys(err?.response?.data?.errors || {})[0]]?.[0] ||
+        "Failed to update profile"
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -61,12 +90,12 @@ const Profile = () => {
     );
   }
 
-  if (error || !profile) {
-    return <div className="text-center text-red-500 p-6">{error || "No profile data found."}</div>;
+  if (error && !isModalOpen) {
+    return <div className="text-center text-red-500 p-6">{error}</div>;
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-8 bg-[#FBFBFB]">
+    <div className="p-6 max-w-5xl mx-auto space-y-8 bg-[#FBFBFB] min-h-screen">
       {/* Profile Section */}
       <div className="bg-white rounded-xl shadow p-6 flex items-center justify-between">
         <div>
@@ -76,11 +105,16 @@ const Profile = () => {
         </div>
         <button
           className="bg-[#003664] text-white px-4 py-2 rounded-full hover:bg-opacity-80"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => { setIsModalOpen(true); setError(""); setSuccess(""); }}
         >
           Edit Profile
         </button>
       </div>
+
+      {/* Success Message */}
+      {success && (
+        <div className="text-center text-green-600 font-semibold">{success}</div>
+      )}
 
       {/* Edit Profile Modal */}
       {isModalOpen && (
@@ -117,18 +151,23 @@ const Profile = () => {
                 className="w-full border px-3 py-2 rounded-full focus:outline-none focus:border-[#003664]"
               />
             </div>
+            {error && (
+              <div className="text-red-500 mb-2 text-sm">{error}</div>
+            )}
             <div className="flex justify-end space-x-2">
               <button
                 className="px-4 py-2 bg-gray-300 rounded-full hover:bg-gray-400"
                 onClick={() => setIsModalOpen(false)}
+                disabled={saving}
               >
                 Cancel
               </button>
               <button
                 className="px-4 py-2 bg-[#003664] text-white rounded-full hover:bg-opacity-80"
                 onClick={handleSaveProfile}
+                disabled={saving}
               >
-                Save
+                {saving ? "Saving..." : "Save"}
               </button>
             </div>
           </div>

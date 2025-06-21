@@ -125,7 +125,7 @@ function SayanaNav({ searchQuery, setSearchQuery }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Link to="/buyer">SAYANA Home</Link>
+          <Link to="/buyer">SYANA Home</Link>
         </motion.div>
 
         {/* Search Input */}

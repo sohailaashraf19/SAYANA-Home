@@ -7,7 +7,6 @@ import 'package:my_house_design/feature/feature/buyer/logic/cubit/buyer_register
 import 'package:my_house_design/feature/feature/buyer/presentation/screens/buyer_login_screen.dart';
 import 'package:my_house_design/presentation/widgets/color.dart';
 
-
 class BuyerSignUpScreen extends StatefulWidget {
   const BuyerSignUpScreen({super.key});
 
@@ -26,7 +25,8 @@ class _BuyerSignUpScreenState extends State<BuyerSignUpScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class _BuyerSignUpScreenState extends State<BuyerSignUpScreen> {
             );
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => BuyerLoginScreen()),
+              MaterialPageRoute(builder: (_) => const BuyerLoginScreen()),
             );
           } else if (state is BuyerRegisterFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -67,7 +67,7 @@ class _BuyerSignUpScreenState extends State<BuyerSignUpScreen> {
                     ),
                   ),
                   leading: IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.black),
+                    icon: const Icon(Icons.arrow_back, color: Colors.black),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -82,6 +82,7 @@ class _BuyerSignUpScreenState extends State<BuyerSignUpScreen> {
                             child: Column(
                               children: [
                                 SizedBox(height: 20.h),
+                                // Name
                                 TextFormField(
                                   controller: nameController,
                                   decoration: InputDecoration(
@@ -90,14 +91,13 @@ class _BuyerSignUpScreenState extends State<BuyerSignUpScreen> {
                                       borderRadius: BorderRadius.circular(25.r),
                                     ),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Name is required';
-                                    }
-                                    return null;
-                                  },
+                                  validator: (value) =>
+                                      value == null || value.isEmpty
+                                          ? 'Name is required'
+                                          : null,
                                 ),
                                 SizedBox(height: 16.h),
+                                // Phone
                                 TextFormField(
                                   controller: phoneController,
                                   keyboardType: TextInputType.phone,
@@ -107,14 +107,13 @@ class _BuyerSignUpScreenState extends State<BuyerSignUpScreen> {
                                       borderRadius: BorderRadius.circular(25.r),
                                     ),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Phone Number is required';
-                                    }
-                                    return null;
-                                  },
+                                  validator: (value) =>
+                                      value == null || value.isEmpty
+                                          ? 'Phone Number is required'
+                                          : null,
                                 ),
                                 SizedBox(height: 16.h),
+                                // Email
                                 TextFormField(
                                   controller: emailController,
                                   keyboardType: TextInputType.emailAddress,
@@ -122,12 +121,9 @@ class _BuyerSignUpScreenState extends State<BuyerSignUpScreen> {
                                     labelText: 'Email Address',
                                     suffixIcon: Checkbox(
                                       value: _isEmailChecked,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _isEmailChecked = value ?? false;
-                                        });
-                                      },
                                       activeColor: primaryColor,
+                                      onChanged: (value) =>
+                                          setState(() => _isEmailChecked = value ?? false),
                                     ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(25.r),
@@ -136,54 +132,49 @@ class _BuyerSignUpScreenState extends State<BuyerSignUpScreen> {
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Email is required';
-                                    } else if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                                    }
+                                    if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
                                       return 'Enter a valid email';
                                     }
                                     return null;
                                   },
                                 ),
                                 SizedBox(height: 16.h),
+                                // Password
                                 TextFormField(
                                   controller: passwordController,
                                   obscureText: !_isPasswordVisible,
                                   decoration: InputDecoration(
                                     labelText: 'Password',
                                     suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _isPasswordVisible = !_isPasswordVisible;
-                                        });
-                                      },
+                                      icon: Icon(_isPasswordVisible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off),
+                                      onPressed: () => setState(
+                                          () => _isPasswordVisible = !_isPasswordVisible),
                                     ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(25.r),
                                     ),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Password is required';
-                                    }
-                                    return null;
-                                  },
+                                  validator: (value) =>
+                                      value == null || value.isEmpty
+                                          ? 'Password is required'
+                                          : null,
                                 ),
                                 SizedBox(height: 16.h),
+                                // Confirm password
                                 TextFormField(
                                   controller: confirmPasswordController,
                                   obscureText: !_isConfirmPasswordVisible,
                                   decoration: InputDecoration(
                                     labelText: 'Confirm Password',
                                     suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-                                        });
-                                      },
+                                      icon: Icon(_isConfirmPasswordVisible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off),
+                                      onPressed: () => setState(() => _isConfirmPasswordVisible =
+                                          !_isConfirmPasswordVisible),
                                     ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(25.r),
@@ -192,7 +183,8 @@ class _BuyerSignUpScreenState extends State<BuyerSignUpScreen> {
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Confirm Password is required';
-                                    } else if (value != passwordController.text) {
+                                    }
+                                    if (value != passwordController.text) {
                                       return 'Passwords do not match';
                                     }
                                     return null;
@@ -203,85 +195,64 @@ class _BuyerSignUpScreenState extends State<BuyerSignUpScreen> {
                           ),
                         ),
                       ),
+                      // Sign‑up button & bottom prompt
                       Column(
                         children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                BuyerRegisterCubit.get(context).registerBuyer(
-                                  name: nameController.text.trim(),
-                                  phone: phoneController.text.trim(),
-                                  email: emailController.text.trim(),
-                                  password: passwordController.text,
-                                  passwordConfirmation: confirmPasswordController.text,
-                                );
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30.r),
+                          // ------------  FULL‑WIDTH BUTTON  -------------
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30.r),
+                                ),
+                                padding: EdgeInsets.symmetric(vertical: 16.h),
                               ),
-                              padding: EdgeInsets.symmetric(vertical: 16.h),
-                            ),
-                            child: state is BuyerRegisterLoading
-                                ? CircularProgressIndicator(color: Colors.white)
-                                : Center(
-                                    child: Text(
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  BuyerRegisterCubit.get(context).registerBuyer(
+                                    name: nameController.text.trim(),
+                                    phone: phoneController.text.trim(),
+                                    email: emailController.text.trim(),
+                                    password: passwordController.text,
+                                    passwordConfirmation:
+                                        confirmPasswordController.text,
+                                  );
+                                }
+                              },
+                              child: state is BuyerRegisterLoading
+                                  ? const CircularProgressIndicator(color: Colors.white)
+                                  : Text(
                                       'Sign Up',
                                       style: TextStyle(
-                                        color: Colors.white,
                                         fontSize: 20.sp,
+                                        color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ),
+                            ),
                           ),
-                          SizedBox(height: 16.h),
-                          Text(
-                            '───────or continue with───────',
-                            style: TextStyle(color: Colors.black, fontSize: 16.sp),
-                          ),
-                          SizedBox(height: 16.h),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              IconButton(
-                                icon: Image.asset('assets/images/apple.png', width: 40.w, height: 40.h),
-                                onPressed: () {},
-                              ),
-                              SizedBox(width: 16.w),
-                              IconButton(
-                                icon: Image.asset('assets/images/google.png', width: 40.w, height: 40.h),
-                                onPressed: () {},
-                              ),
-                              SizedBox(width: 16.w),
-                              IconButton(
-                                icon: Image.asset('assets/images/facebook.png', width: 40.w, height: 40.h),
-                                onPressed: () {},
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 16.h),
+                          SizedBox(height: 24.h),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
                                 'Already have an account? ',
-                                style: TextStyle(color: Colors.black, fontSize: 16.sp),
+                                style: TextStyle(fontSize: 16.sp, color: Colors.black),
                               ),
-                              GestureDetector(
-                                onTap: () {
+                              TextButton(
+                                onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => BuyerLoginScreen()),
+                                    MaterialPageRoute(builder: (_) => const BuyerLoginScreen()),
                                   );
                                 },
                                 child: Text(
                                   'Sign in',
                                   style: TextStyle(
-                                    color: Colors.black,
                                     fontSize: 16.sp,
+                                    color: Colors.black,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),

@@ -51,7 +51,7 @@ const SplashScreen = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
           >
-            Welcome to SAYANA Home
+            Welcome to SYANA Home
           </motion.h1>
 
           {/* النص الثاني بحركة */}

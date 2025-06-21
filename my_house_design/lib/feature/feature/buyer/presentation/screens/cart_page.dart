@@ -265,6 +265,10 @@ class _CartPageState extends State<CartPage> {
                                     builder: (_) => BillingAddressPage()),
                               );
                             },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: boxColor, 
+                              foregroundColor: primaryColor,  
+                            ),
                             child: const Text("Proceed to Checkout"),
                           )
                         ],

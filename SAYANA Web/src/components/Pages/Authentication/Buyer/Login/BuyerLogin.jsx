@@ -84,7 +84,7 @@ const BuyerLogin = () => {
       {/* Right Form */}
       <div className="w-1/2 bg-[#f3f4f6] flex items-start justify-center pt-11">
         <div className="bg-white p-12 rounded-2xl shadow-lg w-full max-w-xl min-h-[650px]">
-          <h1 className="text-3xl font-bold text-[#003664] mb-2 text-left">SAYANA Home</h1>
+          <h1 className="text-3xl font-bold text-[#003664] mb-2 text-left">SYANA Home</h1>
           <h2 className="text-xl font-bold text-[#003664] mb-6 text-left">Buyer Login</h2>
 
           {error && <div className="text-red-500 text-sm mb-4">{error}</div>}

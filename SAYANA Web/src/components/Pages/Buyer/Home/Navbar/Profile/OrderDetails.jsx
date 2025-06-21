@@ -13,7 +13,7 @@ const OrdersDetails = () => {
     product: "Blush Up Cherry Blossom Body Mist",
     date: "May 9",
     status: "Confirmed",
-    price: "119766.28 L.E",
+    price: "119766.28 EGP",
     itemsCount: 4,
     paymentStatus: "Payment due",
     fulfillmentStatus: "Confirmed",
@@ -142,15 +142,15 @@ const OrdersDetails = () => {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Compact Bar Sink</span>
-                <span>5716.28 L.E</span>
+                <span>5716.28 EGP</span>
               </div>
               <div className="flex justify-between">
                 <span>New Shine Cage Swing</span>
-                <span>2000.00 L.E</span>
+                <span>2000.00 EGP</span>
               </div>
               <div className="flex justify-between">
                 <span>Karla dinning room, 6pieces - art-166</span>
-                <span>112000.00 L.E</span>
+                <span>112000.00 EGP</span>
               </div>
             </div>
           </div>
@@ -159,15 +159,15 @@ const OrdersDetails = () => {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>119716.28 L.E</span>
+                <span>119716.28 EGP</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>50.00 L.E</span>
+                <span>50.00 EGP</span>
               </div>
               <div className="flex justify-between font-bold">
                 <span>Total</span>
-                <span>119766.28 L.E</span>
+                <span>119766.28 EGP</span>
               </div>
             </div>
           </div>

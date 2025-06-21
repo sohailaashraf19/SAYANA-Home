@@ -19,10 +19,10 @@ import DecoreImage from "../../../../../assets/decore 1.jpg";
 import LightingImage from "../../../../../assets/lighting 1.jpg";
 import MirrorImage from "../../../../../assets/mirror 1.jpg";
 import CeramicImage from "../../../../../assets/ceramic 1.jpg";
-import SofaImage from "../../../../../assets/sofa 1.jpg";
+import SofaImage from "../../../../../assets/images/living-room.jpg";
 import OFFICEImage from "../../../../../assets/office 2.jpg";
 import ToolsImage from "../../../../../assets/Tool 1.jpg";
-import ChairImage from "../../../../../assets/chair 2.jpg";
+import ChairImage from "../../../../../assets/images/chairs.jpg";
 import FolderImage from "../../../../../assets/folder.jpg";
 
 function Categories() {
@@ -49,10 +49,10 @@ function Categories() {
     lighter: LightingImage,
     mirrors: MirrorImage,
     "ceramic&porcelain": CeramicImage,
-    "livingroom&sofa": SofaImage,
+    "living room": SofaImage,
     office: OFFICEImage,
     "kitchen accessories&tools": ToolsImage,
-    chair: ChairImage,
+    chairs: ChairImage,
     ديكور: FolderImage,
     uuyy: FolderImage,
     uuyy8: FolderImage,

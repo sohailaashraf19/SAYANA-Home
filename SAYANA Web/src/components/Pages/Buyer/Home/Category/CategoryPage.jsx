@@ -400,10 +400,10 @@ function CategoryPage() {
                   )}
                   <div className="mt-auto">
                     <div className="flex items-baseline gap-2 mb-2">
-                      <span className="text-md sm:text-lg font-bold text-blue-700">{discountedPrice.toFixed(2)} L.E</span>
+                      <span className="text-md sm:text-lg font-bold text-blue-700">{discountedPrice.toFixed(2)} EGP</span>
                       {item.discount > 0 && item.price != null && (
                         <span className="text-xs sm:text-sm text-gray-500 line-through">
-                          {parseFloat(item.price).toFixed(2)} L.E
+                          {parseFloat(item.price).toFixed(2)} EGP
                         </span>
                       )}
                     </div>

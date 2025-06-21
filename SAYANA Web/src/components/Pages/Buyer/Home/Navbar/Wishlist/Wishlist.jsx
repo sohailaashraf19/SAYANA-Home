@@ -181,11 +181,11 @@ function Whishlist() {
                     </p>
                     <div className="flex items-center mt-2">
                       <span className="text-md sm:text-lg font-bold text-blue-700">
-                        {discountedPrice} L.E
+                        {discountedPrice} EGP
                       </span>
                       {item.discount > 0 && (
                         <span className="text-sm text-gray-500 line-through ml-2">
-                          {parseFloat(item.price).toFixed(2)} L.E
+                          {parseFloat(item.price).toFixed(2)} EGP
                         </span>
                       )}
                     </div>

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_house_design/core/core/helper/cache_helper.dart';
+import 'package:my_house_design/presentation/widgets/color.dart';
 
 class OrderDetailsPage extends StatefulWidget {
   final Map<String, dynamic> orderData;
@@ -141,6 +142,7 @@ Future<void> reportProduct(int productId) async {
     final totalPrice = widget.orderData['total_price'];
    
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(
           'Order Details',
@@ -189,6 +191,7 @@ Future<void> reportProduct(int productId) async {
                             final productImage = product['image'];
 
                             return Card(
+                              color: boxColor,
                               elevation: 3,
                               margin: EdgeInsets.symmetric(vertical: 8),
                               child: ListTile(

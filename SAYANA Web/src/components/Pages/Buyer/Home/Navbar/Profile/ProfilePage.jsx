@@ -19,8 +19,16 @@ const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const [viewStyle, setViewStyle] = useState("grid");
+  // يتم استخدامه لتخزين البيانات المؤقتة أثناء التعديل
+  const [editUser, setEditUser] = useState({
+    name: "",
+    email: "",
+    phone: ""
+  });
 
   // Fetch user profile and order history
   useEffect(() => {
@@ -72,12 +80,12 @@ const ProfilePage = () => {
           id: order.id,
           product: order.order_items[0]?.product.name || "Unknown Product",
           date: "May 9", // Placeholder; update with order.created_at if available
-          status: order.status.replace("_", " ").toUpperCase(), // e.g., "not_ready" → "Not Ready"
-          mainImage: image1, // Placeholder image
-          extraImages: [image2, image3], // Placeholder images
-          price: `${parseFloat(order.total_price).toFixed(2)} L.E`,
+          status: order.status.replace("_", " ").toUpperCase(),
+          mainImage: image1,
+          extraImages: [image2, image3],
+          price: `${parseFloat(order.total_price).toFixed(2)} EGP`,
           itemsCount: order.order_items.length,
-          paymentStatus: order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1), // e.g., "canceled" → "Canceled"
+          paymentStatus: order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1),
         }));
 
         setOrders(mappedOrders);
@@ -105,11 +113,59 @@ const ProfilePage = () => {
     fetchProfileAndOrders();
   }, [navigate]);
 
-  // Handle saving profile changes (optional: you might want to send to API)
-  const handleSaveProfile = () => {
-    // For now, just close the modal since API update is not specified
-    setIsModalOpen(false);
-    // Optionally, you can add an API call here to update the profile
+  // افتح المودال مع ملء البيانات الحالية
+  const openModalWithUserData = () => {
+    setEditUser({
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+    });
+    setIsModalOpen(true);
+    setError("");
+    setSuccess("");
+  };
+
+  // تحديث بيانات البروفايل فعلياً
+  const handleSaveProfile = async () => {
+    setSaveLoading(true);
+    setError("");
+    setSuccess("");
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.put(
+        "https://olivedrab-llama-457480.hostingersite.com/public/api/buyer/profile",
+        {
+          name: editUser.name,
+          email: editUser.email,
+          phone: editUser.phone,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+      setSuccess("Profile updated successfully!");
+      setIsModalOpen(false);
+      // تحديث بيانات الصفحة فوراً بقيم التعديل
+      setUser((prev) => ({
+        ...prev,
+        name: editUser.name,
+        email: editUser.email,
+        phone: editUser.phone,
+      }));
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.errors) {
+        const errors = err.response.data.errors;
+        setError(Object.values(errors).flat().join(", "));
+      } else {
+        setError("Failed to update profile. Please try again.");
+      }
+    } finally {
+      setSaveLoading(false);
+    }
   };
 
   return (
@@ -129,11 +185,16 @@ const ProfilePage = () => {
           </div>
           <button
             className="bg-[#003664] text-white px-4 py-2 rounded-full hover:bg-opacity-80"
-            onClick={() => setIsModalOpen(true)}
+            onClick={openModalWithUserData}
           >
             Edit Profile
           </button>
         </div>
+      )}
+
+      {/* رسالة نجاح */}
+      {success && (
+        <div className="text-center text-green-600 font-semibold">{success}</div>
       )}
 
       {isModalOpen && (
@@ -144,8 +205,8 @@ const ProfilePage = () => {
               <label className="block text-sm text-gray-700">Name</label>
               <input
                 type="text"
-                value={user.name}
-                onChange={(e) => setUser({ ...user, name: e.target.value })}
+                value={editUser.name}
+                onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
                 className="w-full border px-3 py-2 rounded-full focus:outline-none focus:border-[#003664]"
               />
             </div>
@@ -153,8 +214,8 @@ const ProfilePage = () => {
               <label className="block text-sm text-gray-700">Email</label>
               <input
                 type="email"
-                value={user.email}
-                onChange={(e) => setUser({ ...user, email: e.target.value })}
+                value={editUser.email}
+                onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
                 className="w-full border px-3 py-2 rounded-full focus:outline-none focus:border-[#003664]"
               />
             </div>
@@ -162,23 +223,28 @@ const ProfilePage = () => {
               <label className="block text-sm text-gray-700">Phone</label>
               <input
                 type="text"
-                value={user.phone}
-                onChange={(e) => setUser({ ...user, phone: e.target.value })}
+                value={editUser.phone}
+                onChange={(e) => setEditUser({ ...editUser, phone: e.target.value })}
                 className="w-full border px-3 py-2 rounded-full focus:outline-none focus:border-[#003664]"
               />
             </div>
+            {error && (
+              <div className="text-red-500 mb-2 text-sm">{error}</div>
+            )}
             <div className="flex justify-end space-x-2">
               <button
                 className="px-4 py-2 bg-gray-300 rounded-full hover:bg-gray-400"
                 onClick={() => setIsModalOpen(false)}
+                disabled={saveLoading}
               >
                 Cancel
               </button>
               <button
                 className="px-4 py-2 bg-[#003664] text-white rounded-full hover:bg-opacity-80"
                 onClick={handleSaveProfile}
+                disabled={saveLoading}
               >
-                Save
+                {saveLoading ? "Saving..." : "Save"}
               </button>
             </div>
           </div>

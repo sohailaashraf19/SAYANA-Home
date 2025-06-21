@@ -6,6 +6,7 @@ import 'package:my_house_design/feature/feature/buyer/presentation/screens/Setti
 import 'package:my_house_design/presentation/views/home_view.dart';
 import 'package:my_house_design/feature/feature/buyer/presentation/screens/all_categories_page.dart';
 import 'package:my_house_design/feature/feature/buyer/presentation/screens/botttomnavbar.dart';
+import 'package:my_house_design/presentation/widgets/color.dart';
 import 'package:my_house_design/presentation/widgets/home_screen.dart';
 import 'package:my_house_design/feature/feature/buyer/presentation/screens/wishlistpage.dart';
 
@@ -198,6 +199,7 @@ class _AllFurnitureState extends State<AllFurniture> {
         return true;
       },
       child: Scaffold(
+        backgroundColor: backgroundColor,
         appBar: AppBar(title: const Text('All Furniture', style: TextStyle(color: Colors.white)),
           backgroundColor: const Color(0xFF003664),
           leading: IconButton(

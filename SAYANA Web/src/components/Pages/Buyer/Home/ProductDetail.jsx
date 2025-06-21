@@ -15,7 +15,7 @@ function ProductDetail() {
   const [showAllComments, setShowAllComments] = useState(false); // State for toggling comments
   const [product, setProduct] = useState({
     name: "Loading...",
-    price: "0.00 L.E",
+    price: "0.00 EGP",
     id: null,
     description: "", // Using 'description' as per API data
     image: "https://via.placeholder.com/300x200?text=Loading+Image",
@@ -57,7 +57,7 @@ function ProductDetail() {
 
         setProduct({
           name: data.name || "Unknown Product",
-          price: data.price ? `${data.price} L.E` : "Price not available",
+          price: data.price ? `${data.price} EGP` : "Price not available",
           id: data.product_id,
           description: data.description || "No description available.",
           image: productImageUrl,

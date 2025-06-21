@@ -6,6 +6,7 @@ import 'package:my_house_design/feature/feature/buyer/data/repositories/buyer_se
 import 'package:my_house_design/feature/feature/buyer/logic/cubit/buyer_search_cubit.dart';
 import 'package:my_house_design/feature/feature/buyer/logic/cubit/buyer_search_state.dart';
 import 'package:my_house_design/feature/feature/buyer/presentation/screens/pdPage.dart';
+import 'package:my_house_design/presentation/widgets/color.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
@@ -13,14 +14,20 @@ class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
+
       create: (_) => BuyerSearchCubit(BuyerSearchRepository(Dio())),
+      
       child: Scaffold(
-        
+        backgroundColor: backgroundColor,
         appBar: AppBar(
-          
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back , color: Colors.white,),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
           title: const Text('Search' , style: TextStyle(fontSize: 24, color: Colors.white)),
           backgroundColor: const Color(0xFF003664),
-          
         ),
         body: const BuyerSearchWidget(),
       ),
@@ -110,6 +117,7 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: boxColor,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(

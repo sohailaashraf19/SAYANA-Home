@@ -207,6 +207,7 @@ class _BillingAddressPageState extends State<BillingAddressPage> {
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                   ),
+                  dropdownColor: boxColor,
                   value: selectedCityId,
                   items: cities
                       .map((c) => DropdownMenuItem<int>(value: c['id'], child: Text(c['name'])))
@@ -235,7 +236,12 @@ class _BillingAddressPageState extends State<BillingAddressPage> {
                           await ImagePicker().pickImage(source: ImageSource.gallery);
                       if (img != null) setState(() => instapayImage = img);
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: boxColor, 
+                      foregroundColor: primaryColor,  
+                    ),
                   ),
+
                   if (instapayImage != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 10),

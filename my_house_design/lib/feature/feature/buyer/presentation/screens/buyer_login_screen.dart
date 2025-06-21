@@ -51,12 +51,9 @@ class _BuyerLoginScreenState extends State<BuyerLoginScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.model.message)),
             );
-
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                builder: (context) => const HomeView(), // أو BuyerHomeScreen لو حابب
-              ),
+              MaterialPageRoute(builder: (_) => const HomeView()),
             );
           } else if (state is BuyerLoginFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -77,49 +74,45 @@ class _BuyerLoginScreenState extends State<BuyerLoginScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+              backgroundColor: Colors.white,
               leading: IconButton(
-  icon: Icon(
-    Icons.arrow_back,
-    color: const Color.fromARGB(255, 0, 0, 0), // Set the color of the back arrow to white
-  ),
-  onPressed: () =>  Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ChooseRoleScreen(), // أو BuyerHomeScreen لو حابب
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ChooseRoleScreen()),
+                ),
               ),
-            )
-),
-
             ),
             backgroundColor: backgroundColor,
             body: Center(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    // Logo
                     SizedBox(
                       width: screenHeight * 0.4,
                       height: screenHeight * 0.25,
                       child: Image.asset('assets/images/SYANA HOME.png'),
                     ),
                     SizedBox(height: 20.h),
+                    // Email
                     _buildTextField(
                       controller: emailController,
                       hintText: 'Email',
                       icon: Icons.email,
                     ),
                     SizedBox(height: 15.h),
+                    // Password
                     _buildPasswordField(),
                     _buildOptionsRow(context),
-                    SizedBox(height: 10),
-                    (state is BuyerLoginLoading)
-                        ? const CircularProgressIndicator()
-                        : _buildSignInButton(),
-                    SizedBox(height: 50.h),
-                    _buildDividerWithText(),
-                    SizedBox(height: 20.h),
-                    _buildSocialIcons(),
-                    SizedBox(height: 5),
+                    SizedBox(height: 10.h),
+                    // Sign‑In button
+                    if (state is BuyerLoginLoading)
+                      const CircularProgressIndicator()
+                    else
+                      _buildSignInButton(),
+                    SizedBox(height: 40.h),
+                    // Sign‑Up prompt
                     _buildSignUpRow(context),
                   ],
                 ),
@@ -130,6 +123,8 @@ class _BuyerLoginScreenState extends State<BuyerLoginScreen> {
       ),
     );
   }
+
+  // ---------------- Widgets ----------------
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -182,11 +177,7 @@ class _BuyerLoginScreenState extends State<BuyerLoginScreen> {
                   _isObscure ? Icons.visibility_off : Icons.visibility,
                   color: Colors.grey,
                 ),
-                onPressed: () {
-                  setState(() {
-                    _isObscure = !_isObscure;
-                  });
-                },
+                onPressed: () => setState(() => _isObscure = !_isObscure),
               ),
             ),
           ),
@@ -205,32 +196,23 @@ class _BuyerLoginScreenState extends State<BuyerLoginScreen> {
             children: [
               Checkbox(
                 value: _isRememberMe,
-                onChanged: (value) {
-                  setState(() {
-                    _isRememberMe = value!;
-                  });
-                },
                 activeColor: primaryColor,
+                onChanged: (v) => setState(() => _isRememberMe = v ?? false),
               ),
-              Text(
-                'Remember me',
-                style: TextStyle(color: Colors.black, fontSize: 14.sp),
-              ),
+              Text('Remember me', style: TextStyle(fontSize: 14.sp)),
             ],
           ),
           TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ForgetPassScreen()),
-              );
-            },
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ForgetPassScreen()),
+            ),
             child: Text(
               'Forget Password?',
               style: TextStyle(
-                color: Colors.black,
                 fontSize: 14.sp,
                 decoration: TextDecoration.underline,
+                color: Colors.black,
               ),
             ),
           ),
@@ -250,46 +232,13 @@ class _BuyerLoginScreenState extends State<BuyerLoginScreen> {
             borderRadius: BorderRadius.circular(30.r),
           ),
         ),
-        onPressed: () {
-          cubit.loginBuyer(
-            email: emailController.text.trim(),
-            password: passwordController.text.trim(),
-          );
-        },
-        child: Text(
-          'Sign In',
-          style: TextStyle(fontSize: 18.sp, color: Colors.white),
+        onPressed: () => cubit.loginBuyer(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
         ),
+        child: Text('Sign In',
+            style: TextStyle(fontSize: 18.sp, color: Colors.white)),
       ),
-    );
-  }
-
-  Widget _buildDividerWithText() {
-    return Row(
-      children: [
-        const Expanded(child: Divider(thickness: 1, color: Colors.black)),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10.w),
-          child: Text(
-            'or continue with',
-            style: TextStyle(fontSize: 14.sp, color: Colors.black),
-          ),
-        ),
-        const Expanded(child: Divider(thickness: 1, color: Colors.black)),
-      ],
-    );
-  }
-
-  Widget _buildSocialIcons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset('assets/images/apple.png', height: 40.h),
-        SizedBox(width: 20.w),
-        Image.asset('assets/images/facebook.png', height: 40.h),
-        SizedBox(width: 20.w),
-        Image.asset('assets/images/google.png', height: 40.h),
-      ],
     );
   }
 
@@ -297,21 +246,15 @@ class _BuyerLoginScreenState extends State<BuyerLoginScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          'Don’t have an account?',
-          style: TextStyle(fontSize: 14.sp, color: Colors.black),
-        ),
+        Text('Don’t have an account?',
+            style: TextStyle(fontSize: 14.sp, color: Colors.black)),
         TextButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const BuyerSignUpScreen()),
-            );
-          },
-          child: Text(
-            'Sign Up',
-            style: TextStyle(fontSize: 16.sp, color: Colors.black),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const BuyerSignUpScreen()),
           ),
+          child: Text('Sign Up',
+              style: TextStyle(fontSize: 16.sp, color: Colors.black)),
         ),
       ],
     );

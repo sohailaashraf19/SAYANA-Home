@@ -5,6 +5,7 @@ import 'package:admin_sayana/Screens/Reports/admin_report_page.dart';
 import 'package:admin_sayana/Screens/Voucher/admin_voucher_page.dart';
 import 'package:admin_sayana/Screens/Order/admin_order_page.dart';
 import 'package:admin_sayana/Screens/Login/login_page.dart';
+import 'package:admin_sayana/Screens/Feedback/admin_Feedback.dart'; // تأكد من وجود المسار الصحيح لصفحة الفيدباك
 import 'package:admin_sayana/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -34,9 +35,7 @@ class ProductImage {
 
 class HomePage extends StatefulWidget {
   final Function(int) onItemSelected;
-
   const HomePage({super.key, required this.onItemSelected});
-
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -65,6 +64,9 @@ class _HomePageState extends State<HomePage> {
   String? adminName;
   String? adminEmail;
 
+  // --- Trending Products ---
+  List<Map<String, dynamic>> trendingProducts = [];
+
   @override
   void initState() {
     super.initState();
@@ -74,26 +76,25 @@ class _HomePageState extends State<HomePage> {
     fetchSellers();
     fetchSalesAndRevenue();
     fetchCustomerCount();
+    fetchTrendingProducts();
 
     _timer = Timer.periodic(const Duration(seconds: 60), (timer) {
       fetchProducts();
       fetchSellers();
       fetchCustomerCount();
+      fetchTrendingProducts();
     });
   }
 
   Future<void> fetchAdminProfile() async {
     try {
       final token = globals.globalToken ?? '';
-      print("adminprofile token: $token");
       final response = await http.get(
         Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/admin/adminprofile'),
         headers: {
           'Authorization': 'Bearer $token',
         },
       );
-      print("adminprofile status: ${response.statusCode}");
-      print("adminprofile body: ${response.body}");
       if (!mounted) return;
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -109,7 +110,6 @@ class _HomePageState extends State<HomePage> {
         });
       }
     } catch (e) {
-      print("adminprofile exception: $e");
       if (!mounted) return;
       setState(() {
         adminName = 'Admin';
@@ -156,21 +156,22 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void onFeedbackPressed() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const FeedbackPage()),
+    );
+  }
+
   // ----------- Logout Function -----------
   Future<void> logout() async {
     try {
-      print("Logout button pressed");
-      print("Token before logout: ${globals.globalToken}");
       final token = globals.globalToken ?? '';
       final response = await http.post(
         Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/admin/logout'),
         headers: {'Authorization': 'Bearer $token'},
       );
-      print("Logout response status: ${response.statusCode}");
-      print("Logout response body: ${response.body}");
-
       if (response.statusCode == 200) {
-        print("Logout successful, navigating to LoginPage");
         globals.globalToken = null;
         globals.globalAdminId = null;
         if (!mounted) return;
@@ -179,14 +180,12 @@ class _HomePageState extends State<HomePage> {
           (route) => false,
         );
       } else {
-        print("Logout failed with status: ${response.statusCode}");
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Logout failed: ${response.statusCode}')),
         );
       }
     } catch (e) {
-      print("Logout exception: $e");
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Logout failed: $e')),
@@ -217,7 +216,6 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         isLoading = false;
       });
-      print('Error fetching buyers: $e');
     }
   }
 
@@ -237,9 +235,7 @@ class _HomePageState extends State<HomePage> {
       } else {
         throw Exception('Failed to load products. Status: ${response.statusCode}');
       }
-    } catch (e) {
-      print('Error fetching products: $e');
-    }
+    } catch (e) {}
   }
 
   Future<void> fetchSellers() async {
@@ -258,7 +254,6 @@ class _HomePageState extends State<HomePage> {
         throw Exception('Failed to load seller count. Status: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching seller count: $e');
       if (!mounted) return;
       setState(() {
         sellerCount = 0;
@@ -288,7 +283,6 @@ class _HomePageState extends State<HomePage> {
         throw Exception('Failed to load sales and revenue. Status: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching sales and revenue: $e');
       if (!mounted) return;
       setState(() {
         totalSales = "0 EGP";
@@ -314,10 +308,41 @@ class _HomePageState extends State<HomePage> {
         throw Exception('Failed to load customer count. Status: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching customer count: $e');
       if (!mounted) return;
       setState(() {
         customerCount = 0;
+      });
+    }
+  }
+
+  Future<void> fetchTrendingProducts() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://olivedrab-llama-457480.hostingersite.com/public/api/getadminPopularProducts'),
+      );
+      if (!mounted) return;
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        List<dynamic> data;
+        if (decoded is Map && decoded.containsKey('products')) {
+          data = decoded['products'];
+        } else if (decoded is List) {
+          data = decoded;
+        } else {
+          data = [];
+        }
+        setState(() {
+          trendingProducts = data.cast<Map<String, dynamic>>();
+        });
+      } else {
+        setState(() {
+          trendingProducts = [];
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        trendingProducts = [];
       });
     }
   }
@@ -355,9 +380,7 @@ class _HomePageState extends State<HomePage> {
       } else {
         throw Exception('Failed to search. Status: ${response.statusCode}');
       }
-    } catch (e) {
-      print('Error searching: $e');
-    }
+    } catch (e) {}
   }
 
   void _showOverlay() {
@@ -500,6 +523,11 @@ class _HomePageState extends State<HomePage> {
               _buildDrawerTile(Icons.receipt_long, 'Orders', 4),
               _buildDrawerTile(Icons.bar_chart, 'Reports', 5),
               _buildDrawerTile(Icons.card_giftcard, 'Vouchers', 6),
+              ListTile(
+                leading: Icon(Icons.feedback, color: Colors.white),
+                title: Text('Feedback', style: TextStyle(color: Colors.white)),
+                onTap: onFeedbackPressed,
+              ),
               const Divider(color: Colors.white70),
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.red),
@@ -511,132 +539,193 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header Row
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Builder(
-                        builder: (context) => IconButton(
-                          icon: Icon(Icons.menu, color: primaryColor),
-                          onPressed: () => Scaffold.of(context).openDrawer(),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      CircleAvatar(
-                        backgroundColor: Colors.white,
-                        radius: 22,
-                        backgroundImage: AssetImage('assets/SYANA HOME.png'),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        adminName ?? '',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: primaryColor,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      Row(
+                        children: [
+                          Builder(
+                            builder: (context) => IconButton(
+                              icon: Icon(Icons.menu, color: primaryColor),
+                              onPressed: () => Scaffold.of(context).openDrawer(),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          CircleAvatar(
+                            backgroundColor: Colors.white,
+                            radius: 22,
+                            backgroundImage: AssetImage('assets/SYANA HOME.png'),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            adminName ?? '',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: primaryColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: CompositedTransformTarget(
-                link: _layerLink,
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (value) => fetchSearchResults(value),
-                  decoration: InputDecoration(
-                    hintText: 'Search product',
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: boxColor,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                ),
+                // Search Field
+                CompositedTransformTarget(
+                  link: _layerLink,
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) => fetchSearchResults(value),
+                    decoration: InputDecoration(
+                      hintText: 'Search product',
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      fillColor: boxColor,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(child: _buildStatBox(productCount.toString(), "Products")),
-                      const SizedBox(width: 10),
-                      Expanded(child: _buildStatBox(sellerCount.toString(), "Sellers")),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatBox(
-                          isSalesAndRevenueLoading ? "0" : revenue,
-                          "Revenue",
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(child: _buildStatBox(customerCount.toString(), "Customers")),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  _buildStatBox(
-                    isSalesAndRevenueLoading ? "0" : totalSales,
-                    "Total Sales",
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 20),
+                // Stats
+                Row(
                   children: [
-                    const Text(
-                      "Best Users",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                    ),
-                    const SizedBox(height: 10),
+                    Expanded(child: _buildStatBox(productCount.toString(), "Products")),
+                    const SizedBox(width: 10),
+                    Expanded(child: _buildStatBox(sellerCount.toString(), "Sellers")),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
                     Expanded(
-                      child: isLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : buyers.isEmpty
-                              ? const Center(child: Text("No results found"))
-                              : ListView.builder(
-                                  itemCount: buyers.length,
-                                  itemBuilder: (context, index) {
-                                    final item = buyers[index];
-                                    return _buildUserRow(
-                                      index + 1,
-                                      item['name'] ?? 'Unknown',
-                                      'Customer',
-                                      index: index,
-                                    );
-                                  },
-                                ),
+                      child: _buildStatBox(
+                        isSalesAndRevenueLoading ? "0" : revenue,
+                        "Revenue",
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(child: _buildStatBox(customerCount.toString(), "Customers")),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                // Total Sales Centered
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 220,
+                      child: _buildStatBox(
+                        isSalesAndRevenueLoading ? "0" : totalSales,
+                        "Total Sales",
+                      ),
                     ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 20),
+                // Best Users Section
+                const Text(
+                  "Best Users",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                const SizedBox(height: 10),
+                isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : buyers.isEmpty
+                        ? const Center(child: Text("No results found"))
+                        : ListView.builder(
+                            itemCount: buyers.length,
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              final item = buyers[index];
+                              return _buildUserRow(
+                                index + 1,
+                                item['name'] ?? 'Unknown',
+                                'Customer',
+                                index: index,
+                              );
+                            },
+                          ),
+                const SizedBox(height: 20),
+                // Trending Product Section (directly after Best Users)
+                const Text(
+                  "Trending Product",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                const SizedBox(height: 10),
+                trendingProducts.isEmpty
+                    ? const Text("No trending products found.")
+                    : SizedBox(
+                        height: 110,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: trendingProducts.length,
+                          separatorBuilder: (context, idx) => const SizedBox(width: 12),
+                          itemBuilder: (context, idx) {
+                            final product = trendingProducts[idx];
+                            final String imageUrl =
+                                product['image'] != null && product['image'].toString().isNotEmpty
+                                    ? 'https://olivedrab-llama-457480.hostingersite.com/${product['image']}'
+                                    : 'https://via.placeholder.com/80';
+                            return Container(
+                              width: 180,
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: primaryColor, width: 1),
+                              ),
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      imageUrl,
+                                      width: 75,
+                                      height: 75,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => Image.asset(
+                                        'assets/img/placeholder.png',
+                                        width: 75,
+                                        height: 75,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      product['name'] ?? '',
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                const SizedBox(height: 20),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
